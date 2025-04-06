@@ -8,13 +8,14 @@ use App\Models\ClassModel;
 use App\Models\Subject;
 use App\Models\GradeTask;
 use App\Models\Student;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class GradeReportController extends Controller
 {
     public function index(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $selectedSubject = $request->input('subject_id');
         $selectedTaskType = $request->input('task_name');
 

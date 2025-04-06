@@ -10,12 +10,13 @@ use App\Models\Subject;
 use App\Models\GradeTask;
 use App\Models\Student;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
 public function index()
 {
-    $user = auth()->user();
+    $user = Auth::user();
 
     if ($user->hasRole('Wali Kelas')) {
         // --- Logika Dashboard Wali Kelas (pindahin dari DashboardGuruController) ---

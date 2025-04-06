@@ -19,14 +19,17 @@
 
             <!-- Filter Section -->
             <div class="p-6 border-b">
-                <form method="GET" action="{{ route('notifications.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <form method="GET" action="{{ route('notifications.index') }}"
+                    class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <!-- Subject Filter -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Mata Pelajaran</label>
-                        <select name="subject_id" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 h-10 pl-3 pr-8">
+                        <select name="subject_id"
+                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 h-10 pl-3 pr-8">
                             <option value="">Semua Mata Pelajaran</option>
                             @foreach ($subjects as $subject)
-                                <option value="{{ $subject->id }}" {{ request('subject_id') == $subject->id ? 'selected' : '' }}>
+                                <option value="{{ $subject->id }}"
+                                    {{ request('subject_id') == $subject->id ? 'selected' : '' }}>
                                     {{ $subject->name }}
                                 </option>
                             @endforeach
@@ -36,10 +39,12 @@
                     <!-- Task Filter -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Tugas</label>
-                        <select name="task_name" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 h-10 pl-3 pr-8">
+                        <select name="task_name"
+                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 h-10 pl-3 pr-8">
                             <option value="">Semua Tugas</option>
                             @foreach ($taskNames as $task)
-                                <option value="{{ $task }}" {{ request('task_name') == $task ? 'selected' : '' }}>
+                                <option value="{{ $task }}"
+                                    {{ request('task_name') == $task ? 'selected' : '' }}>
                                     {{ $task }}
                                 </option>
                             @endforeach
@@ -48,7 +53,8 @@
 
                     <!-- Filter Button -->
                     <div class="flex items-end">
-                        <button type="submit" class="w-full h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center justify-center">
+                        <button type="submit"
+                            class="w-full h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center justify-center">
                             <span class="iconify mr-2" data-icon="mdi:filter"></span>
                             Filter
                         </button>
@@ -60,9 +66,11 @@
                             <p class="text-sm text-gray-600">
                                 <span class="font-medium">Filter Aktif:</span>
                                 <span>
-                                    @if(request('subject_id'))
+                                    @if (request('subject_id'))
                                         {{ $subjects->firstWhere('id', request('subject_id'))->name ?? 'Semua Mata Pelajaran' }}
-                                        @if(request('task_name')) - {{ request('task_name') }} @endif
+                                        @if (request('task_name'))
+                                            - {{ request('task_name') }}
+                                        @endif
                                     @else
                                         Semua Data
                                     @endif
@@ -80,12 +88,24 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Siswa</th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor HP Orang Tua</th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nilai</th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    No</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Nama Siswa</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Nomor HP Orang Tua</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Nilai</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status</th>
+                                <th scope="col"
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -95,13 +115,13 @@
                                         ->where('subject_id', request('subject_id'))
                                         ->where('task_name', request('task_name'))
                                         ->first();
-                                    
+
                                     $notification = $student->notifications
                                         ->where('subject_id', request('subject_id'))
                                         ->where('task_name', request('task_name'))
                                         ->first();
                                 @endphp
-                                
+
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                                         {{ $loop->iteration + ($students->currentPage() - 1) * $students->perPage() }}
@@ -114,12 +134,16 @@
                                         {{ $student->parent_phone ?? '-' }}
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                                        @if($filteredTask)
-                                            <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full 
-                                                {{ $filteredTask->score >= 90 ? 'bg-green-100 text-green-800' : 
-                                                   ($filteredTask->score >= 75 ? 'bg-blue-100 text-blue-800' : 
-                                                   ($filteredTask->score >= 60 ? 'bg-yellow-100 text-yellow-800' : 
-                                                   'bg-red-100 text-red-800')) }}">
+                                        @if ($filteredTask)
+                                            <span
+                                                class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full 
+                                                {{ $filteredTask->score >= 90
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : ($filteredTask->score >= 75
+                                                        ? 'bg-blue-100 text-blue-800'
+                                                        : ($filteredTask->score >= 60
+                                                            ? 'bg-yellow-100 text-yellow-800'
+                                                            : 'bg-red-100 text-red-800')) }}">
                                                 {{ $filteredTask->score }}
                                             </span>
                                         @else
@@ -142,18 +166,18 @@
                                     <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
                                             @if ($notification && $notification->sent_at)
-                                                <button onclick="sendNotification([{{ $student->id }}])" 
+                                                <button onclick="sendNotification([{{ $student->id }}])"
                                                     class="text-yellow-600 hover:text-yellow-900 bg-yellow-50 hover:bg-yellow-100 px-3 py-1 rounded-md text-sm flex items-center">
                                                     <span class="iconify mr-1" data-icon="mdi:send-outline"></span>
                                                     Kirim Ulang
                                                 </button>
-                                                <button onclick="resetNotificationStatus([{{ $student->id }}])" 
+                                                <button onclick="resetNotificationStatus([{{ $student->id }}])"
                                                     class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-sm flex items-center">
                                                     <span class="iconify mr-1" data-icon="mdi:refresh"></span>
                                                     Reset
                                                 </button>
                                             @else
-                                                <button onclick="sendNotification([{{ $student->id }}])" 
+                                                <button onclick="sendNotification([{{ $student->id }}])"
                                                     class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-md text-sm flex items-center">
                                                     <span class="iconify mr-1" data-icon="mdi:send-outline"></span>
                                                     Kirim
@@ -168,7 +192,7 @@
                 </div>
 
                 <!-- Pagination -->
-                @if($students->hasPages())
+                @if ($students->hasPages())
                     <div class="mt-4">
                         {{ $students->appends(request()->except('page'))->links() }}
                     </div>
@@ -181,7 +205,7 @@
                         <span class="iconify mr-2" data-icon="mdi:send-outline"></span>
                         Kirim Semua Notifikasi
                     </button>
-                    
+
                     <button type="button" onclick="resetNotificationStatus()"
                         class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                         <span class="iconify mr-2" data-icon="mdi:refresh"></span>

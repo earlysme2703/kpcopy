@@ -1,7 +1,6 @@
 <aside
     class="h-screen bg-gradient-to-b from-[#030330] to-[#03044b] text-white p-3 flex flex-col transition-all duration-300 ease-in-out overflow-hidden"
-    x-cloak x-data="sidebar()" :class="isOpen ? 'w-64' : 'w-20'" 
-    @mouseleave="handleMouseLeave()">
+    x-cloak x-data="sidebar()" :class="isOpen ? 'w-64' : 'w-20'" @mouseleave="handleMouseLeave()">
     <!-- Logo Section -->
     <div class="flex items-center px-2 mb-6 h-16">
         <img src="https://ucarecdn.com/60bcc816-2da9-4f6a-ab6e-b926d11341e1/LogoTutWuriHandayani.png" alt="Logo"
@@ -57,7 +56,7 @@
 
             <!-- Manajemen Kelas -->
             <li>
-                <a href="#" @click="handleNavigation"
+                <a href="{{ route('admin.kelas.index') }}" @click="handleNavigation"
                     class="w-full flex items-center rounded-lg hover:bg-white/10 transition-all duration-300 ease-in-out h-14">
                     <div class="w-14 h-14 flex items-center justify-center flex-shrink-0">
                         <span class="iconify text-2xl" data-icon="mdi:google-classroom"></span>
@@ -139,19 +138,19 @@
                 </a>
             </li>
 
-            
+
             <!-- Manajemen Pengguna -->
             <a href="{{ route('admin.users.index') }}" @click="handleNavigation"
-            class="w-full flex items-center rounded-lg hover:bg-white/10 transition-all duration-300 ease-in-out h-14">
-            <div class="w-14 h-14 flex items-center justify-center flex-shrink-0">
-                <span class="iconify text-2xl" data-icon="mdi:account-circle"></span>
-            </div>
-            <div class="overflow-hidden whitespace-nowrap transition-opacity duration-300"
-                :class="isOpen ? 'opacity-100 w-full' : 'opacity-0 w-0'">
-                <span>Pengelolaan Akun</span>
-            </div>
-        </a>
-        
+                class="w-full flex items-center rounded-lg hover:bg-white/10 transition-all duration-300 ease-in-out h-14">
+                <div class="w-14 h-14 flex items-center justify-center flex-shrink-0">
+                    <span class="iconify text-2xl" data-icon="mdi:account-circle"></span>
+                </div>
+                <div class="overflow-hidden whitespace-nowrap transition-opacity duration-300"
+                    :class="isOpen ? 'opacity-100 w-full' : 'opacity-0 w-0'">
+                    <span>Pengelolaan Akun</span>
+                </div>
+            </a>
+
 
             <!-- Manajemen Pengguna -->
             <li>
@@ -204,10 +203,11 @@
 
                 // Mencegah flash dengan menambahkan kelas x-cloak dari Alpine
                 document.querySelector('aside').classList.remove('opacity-0');
-                
+
                 // Mengembalikan posisi scroll sidebar saat halaman dimuat
                 this.$nextTick(() => {
-                    const savedScrollPosition = localStorage.getItem('sidebarScrollPosition');
+                    const savedScrollPosition = localStorage.getItem(
+                        'sidebarScrollPosition');
                     if (savedScrollPosition) {
                         this.$refs.navScroll.scrollTop = parseInt(savedScrollPosition);
                     }

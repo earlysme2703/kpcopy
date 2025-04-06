@@ -2,22 +2,17 @@
 
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\GradeReportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfilePictureController;
+use App\Http\Controllers\ClassController;
 
 Route::get('/', function () {
     return view('welcome');
 });
-
-// Login & Logout
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Dashboard Gabungan (Admin & Wali Kelas)
 Route::middleware(['auth'])->group(function () {
@@ -28,18 +23,14 @@ Route::middleware(['auth'])->group(function () {
 // 👑 ADMIN ONLY
 // =====================
 
-Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('users', UserController::class);
-});
+Route::middleware(['auth', 'role:Admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::resource('users', UserController::class);
+        Route::resource('kelas', ClassController::class);
+    });
 
-// Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
-//     Route::get('/users', [UserController::class, 'index'])->name('users.index');
-//     Route::post('/users', [UserController::class, 'store'])->name('users.store');
-//     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-//     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
-//     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
-// });
-// =====================
 // 🧑‍🏫 WALI KELAS ONLY
 // =====================
 Route::middleware(['auth', 'role:Wali Kelas'])->group(function () {
@@ -73,4 +64,4 @@ Route::middleware('auth')->group(function () {
 });
 
 // Otentikasi bawaan Laravel Breeze/Fortify
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
