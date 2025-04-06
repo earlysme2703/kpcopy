@@ -42,7 +42,7 @@
 
             <!-- Manajemen Siswa -->
             <li>
-                <a href="#" @click="handleNavigation"
+                <a href="{{ route('admin.siswa.kelas') }}" @click="handleNavigation"
                     class="w-full flex items-center rounded-lg hover:bg-white/10 transition-all duration-300 ease-in-out h-14">
                     <div class="w-14 h-14 flex items-center justify-center flex-shrink-0">
                         <span class="iconify text-2xl" data-icon="mdi:account-group"></span>

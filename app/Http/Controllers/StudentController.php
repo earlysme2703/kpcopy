@@ -1,74 +1,106 @@
 <?php
-// app/Http/Controllers/StudentController.php
+
 namespace App\Http\Controllers;
 
-use App\Models\ClassModel;
 use App\Models\Student;
-use App\Models\Kelas;
+use App\Models\ClassModel;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
-    public function index()
-    {
-        $students = Student::with('class')->get();
-        return view('admin.siswa.index', compact('students'));
-    }
-
-    public function create()
+    // 🔹 Halaman awal: grid kelas
+    public function pilihKelas()
     {
         $classes = ClassModel::all();
-        return view('admin.siswa.create', compact('classes'));
+        return view('students.index', compact('classes'));
     }
 
+    // 🔹 Index: daftar siswa per kelas
+    public function index($classId)
+    {
+        $class = ClassModel::findOrFail($classId);
+        $students = Student::where('class_id', $classId)->get();
+
+        return view('students.index', compact('class', 'students'));
+    }
+
+    // 🔹 List: daftar siswa per kelas (untuk tampilan tabel)
+    public function list($classId)
+    {
+        $class = ClassModel::findOrFail($classId);
+        $students = Student::where('class_id', $classId)->get();
+
+        return view('students.list', compact('class', 'students'));
+    }
+
+    // 🔹 Tampilkan form tambah siswa
+    public function create(Request $request)
+    {
+        $classId = $request->query('class_id');
+        $class = ClassModel::findOrFail($classId);
+
+        return view('students.create', compact('class'));
+    }
+
+    // 🔹 Simpan siswa
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'nis' => 'nullable',
-            'gender' => 'required|in:L,P',
-            'parent_name' => 'required',
-            'parent_phone' => 'required',
-            'birth_place' => 'required',
-            'birth_date' => 'required|date',
             'class_id' => 'required|exists:classes,id',
+            'name' => 'required|string|max:255',
+            'nis' => 'nullable|string|max:50',
+            'gender' => 'required|in:L,P',
+            'parent_name' => 'nullable|string|max:255',
+            'birth_place' => 'nullable|string|max:255',
+            'birth_date' => 'nullable|date',
+            'parent_phone' => 'required|string|starts_with:62',
         ]);
 
         Student::create($request->all());
-        return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil ditambahkan');
+
+        return redirect()->route('admin.siswa.list', $request->class_id)
+                         ->with('success', 'Siswa berhasil ditambahkan.');
     }
 
-    public function show(Student $siswa)
+    // 🔹 Show detail siswa
+    public function show(Student $student)
     {
-        return view('admin.siswa.show', compact('siswa'));
+        return view('students.show', compact('student'));
     }
 
-    public function edit(Student $siswa)
+    // 🔹 Tampilkan form edit
+    public function edit(Student $student)
     {
-        $classes = ClassModel::all();
-        return view('admin.siswa.edit', compact('siswa', 'classes'));
+        $class = $student->class;
+        return view('students.edit', compact('student', 'class'));
     }
 
-    public function update(Request $request, Student $siswa)
+    // 🔹 Simpan perubahan siswa
+    public function update(Request $request, Student $student)
     {
         $request->validate([
-            'name' => 'required',
-            'nis' => 'nullable',
+            'name' => 'required|string|max:255',
+            'nis' => 'nullable|string|max:50',
             'gender' => 'required|in:L,P',
-            'parent_name' => 'required',
-            'parent_phone' => 'required',
-            'birth_place' => 'required',
-            'birth_date' => 'required|date',
-            'class_id' => 'required|exists:classes,id',
+            'parent_name' => 'nullable|string|max:255',
+            'birth_place' => 'nullable|string|max:255',
+            'birth_date' => 'nullable|date',
+            'parent_phone' => 'required|string|starts_with:62',
         ]);
 
-        $siswa->update($request->all());
-        return redirect()->route('admin.siswa.index')->with('success', 'Data siswa diperbarui');
+        $student->update($request->all());
+
+        return redirect()->route('admin.siswa.list', $student->class_id)
+                         ->with('success', 'Data siswa berhasil diperbarui.');
     }
 
-    public function destroy(Student $siswa)
+    // 🔹 Hapus siswa
+    public function destroy(Student $student)
     {
-        $siswa->delete();
-        return back()->with('success', 'Siswa dihapus');
+        $classId = $student->class_id;
+        $student->delete();
+
+        return redirect()->route('admin.siswa.list', $classId)
+                         ->with('success', 'Siswa berhasil dihapus.');
     }
 }
