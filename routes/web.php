@@ -4,12 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GradeController;
+use App\Http\Controllers\GradeExportController;
 use App\Http\Controllers\GradeReportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfilePictureController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
+
 
 // =====================
 // 🎉 Halaman Awal (Welcome)
@@ -32,21 +34,14 @@ Route::middleware(['auth', 'role:Admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        // Manajemen Pengguna
         Route::resource('users', UserController::class);
-        // Manajemen Kelas
         Route::resource('kelas', ClassController::class);
-        
-        // 📌 SISWA
         // Halaman awal → pilih kelas dulu
         Route::get('siswa', [StudentController::class, 'pilihKelas'])->name('siswa.kelas');
-
         // Daftar siswa berdasarkan kelas (index view)
         Route::get('siswa/kelas/{class}', [StudentController::class, 'index'])->name('siswa.index');
-
         // Untuk tampilan tabel siswa per kelas
         Route::get('siswa/list/{class}', [StudentController::class, 'list'])->name('siswa.list');
-
         // Resource siswa (tanpa index karena ditangani khusus per kelas)
         Route::resource('siswa', StudentController::class)
             ->parameters(['siswa' => 'student'])
@@ -80,6 +75,11 @@ Route::middleware(['auth', 'role:Wali Kelas'])->group(function () {
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('notifications/send', [NotificationController::class, 'sendNotification'])->name('notifications.send');
     Route::post('notifications/reset', [NotificationController::class, 'resetNotificationStatus'])->name('notifications.reset');
+
+    Route::get('/grades/export', [App\Http\Controllers\GradeExportController::class, 'index'])->name('grades.export');
+    Route::post('/grades/generate-export', [App\Http\Controllers\GradeExportController::class, 'generateExport'])->name('grades.generate-export');
+    
+
 });
 
 // =====================

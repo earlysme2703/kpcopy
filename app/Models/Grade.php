@@ -8,15 +8,24 @@ class Grade extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['student_id', 'subject_id', 'final_score'];
+    protected $fillable = [
+        'student_id',
+        'subject_id',
+        'semester',
+        'average_written',
+        'average_observation',
+        'average_homework',
+        'midterm_score',
+        'final_exam_score',
+        'final_score',
+        'grade_letter',
+    ];
 
-    // Relasi ke tabel students
     public function student()
     {
         return $this->belongsTo(Student::class);
     }
 
-    // Relasi ke tabel subjects
     public function subject()
     {
         return $this->belongsTo(Subject::class);
