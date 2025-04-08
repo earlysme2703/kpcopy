@@ -30,4 +30,8 @@ class Grade extends Model
     {
         return $this->belongsTo(Subject::class);
     }
+    public function gradeTasks()
+    {
+    return $this->hasMany(GradeTask::class, 'grades_id');
+    }
 }

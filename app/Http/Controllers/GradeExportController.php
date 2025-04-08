@@ -13,13 +13,12 @@ use App\Exports\GradesExport;
 use App\Models\ClassModel;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class GradeExportController extends Controller
 {
-
     public function index()
     {
-        // Get the class for the logged-in class teacher based on class_id
         $class = null;
         if (auth()->user()->class_id) {
             $class = ClassModel::find(auth()->user()->class_id);
@@ -30,13 +29,11 @@ class GradeExportController extends Controller
         $selectedSubject = null;
         $selectedSemester = null;
         
-        // Check if filter is applied via request parameters
         if (request()->has('subject_id') && request()->has('semester')) {
             $selectedSubject = Subject::find(request('subject_id'));
             $selectedSemester = request('semester');
             
             if ($class && $selectedSubject) {
-                // Get students and their grades for the selected subject and semester
                 $students = Student::where('class_id', $class->id)->get();
                 
                 foreach ($students as $student) {
@@ -44,16 +41,47 @@ class GradeExportController extends Controller
                         'student_id' => $student->id,
                         'student_number' => $student->nis,
                         'name' => $student->name,
-                        'grade_details' => []
+                        'written' => array_fill(0, 5, '-'),
+                        'observation' => array_fill(0, 5, '-'),
+                        'homework' => array_fill(0, 5, '-'),
+                        'grade_details' => [
+                            'average_written' => null,
+                            'average_observation' => null,
+                            'average_homework' => null,
+                            'midterm_score' => null,
+                            'final_exam_score' => null,
+                            'final_score' => null,
+                            'grade_letter' => '-'
+                        ]
                     ];
                     
-                    // Get the detailed grade data for this student
+                    // Ambil grade untuk semester tertentu
                     $grade = Grade::where('student_id', $student->id)
                              ->where('subject_id', $selectedSubject->id)
                              ->where('semester', $selectedSemester)
                              ->first();
                     
                     if ($grade) {
+                        // Ambil tugas individu melalui relasi
+                        $tasks = $grade->gradeTasks;
+                        
+                        // Log untuk debugging
+                        Log::info("Grade for student {$student->name}", ['grade' => $grade->toArray()]);
+                        Log::info("Tasks for student {$student->name}", ['tasks' => $tasks->toArray()]);
+                        
+                        foreach ($tasks as $task) {
+                            if (preg_match('/Tertulis (\d+)/i', $task->task_name, $matches)) {
+                                $index = min((int)$matches[1] - 1, 4);
+                                $studentData['written'][$index] = $task->score;
+                            } elseif (preg_match('/Pengamatan (\d+)/i', $task->task_name, $matches)) {
+                                $index = min((int)$matches[1] - 1, 4);
+                                $studentData['observation'][$index] = $task->score;
+                            } elseif (preg_match('/Tugas (\d+)/i', $task->task_name, $matches)) {
+                                $index = min((int)$matches[1] - 1, 4);
+                                $studentData['homework'][$index] = $task->score;
+                            }
+                        }
+                        
                         $studentData['grade_details'] = [
                             'average_written' => $grade->average_written,
                             'average_observation' => $grade->average_observation,
@@ -63,31 +91,14 @@ class GradeExportController extends Controller
                             'final_score' => $grade->final_score,
                             'grade_letter' => $grade->grade_letter
                         ];
+                    } else {
+                        // Log jika grade tidak ditemukan
+                        Log::warning("No grade found for student {$student->name}", [
+                            'student_id' => $student->id,
+                            'subject_id' => $selectedSubject->id,
+                            'semester' => $selectedSemester
+                        ]);
                     }
-                    
-                    // Get the individual task scores
-                    $tasks = GradeTask::where('student_id', $student->id)
-                            ->where('subject_id', $selectedSubject->id)
-                            ->get();
-                    
-                    $written = [];
-                    $observation = [];
-                    $homework = [];
-                    
-                    foreach ($tasks as $task) {
-                        if ($task->type == 'written') {
-                            $written[] = $task->score;
-                        } elseif ($task->type == 'observation') {
-                            $observation[] = $task->score;
-                        } elseif ($task->type == 'homework') {
-                            $homework[] = $task->score;
-                        }
-                    }
-                    
-                    // Pad arrays to ensure consistent columns
-                    $studentData['written'] = array_pad($written, 7, '');
-                    $studentData['observation'] = array_pad($observation, 4, '');
-                    $studentData['homework'] = array_pad($homework, 5, '');
                     
                     $studentsData[] = $studentData;
                 }
@@ -96,6 +107,7 @@ class GradeExportController extends Controller
         
         return view('exports.index', compact('class', 'subjects', 'studentsData', 'selectedSubject', 'selectedSemester'));
     }
+
     public function exportPDF(Request $request)
     {
         $subject_id = $request->subject_id;
@@ -148,40 +160,43 @@ class GradeExportController extends Controller
                 'student_id' => $student->id,
                 'student_number' => $student->nis,
                 'name' => $student->name,
-                'written' => [],
-                'observation' => [],
-                'homework' => [],
-                'average_written' => 0,
-                'average_observation' => 0,
-                'average_homework' => 0,
-                'midterm_score' => 0,
-                'final_exam_score' => 0,
-                'final_score' => 0,
-                'grade_letter' => ''
+                'written' => array_fill(0, 5, '-'),
+                'observation' => array_fill(0, 5, '-'),
+                'homework' => array_fill(0, 5, '-'),
+                'average_written' => null,
+                'average_observation' => null,
+                'average_homework' => null,
+                'midterm_score' => null,
+                'final_exam_score' => null,
+                'final_score' => null,
+                'grade_letter' => '-'
             ];
             
-            // Ambil nilai tugas individu
-            $tasks = GradeTask::where('student_id', $student->id)
-                            ->where('subject_id', $subject_id)
-                            ->get();
-                            
-            foreach ($tasks as $task) {
-                if ($task->type == 'written') {
-                    $studentData['written'][] = $task->score;
-                } elseif ($task->type == 'observation') {
-                    $studentData['observation'][] = $task->score;
-                } elseif ($task->type == 'homework') {
-                    $studentData['homework'][] = $task->score;
-                }
-            }
-            
-            // Ambil ringkasan nilai
             $grade = Grade::where('student_id', $student->id)
                          ->where('subject_id', $subject_id)
                          ->where('semester', $semester)
                          ->first();
                          
             if ($grade) {
+                $tasks = $grade->gradeTasks;
+                
+                // Log untuk debugging
+                Log::info("Grade for student {$student->name}", ['grade' => $grade->toArray()]);
+                Log::info("Tasks for student {$student->name}", ['tasks' => $tasks->toArray()]);
+                
+                foreach ($tasks as $task) {
+                    if (preg_match('/Tertulis (\d+)/i', $task->task_name, $matches)) {
+                        $index = min((int)$matches[1] - 1, 4);
+                        $studentData['written'][$index] = $task->score;
+                    } elseif (preg_match('/Pengamatan (\d+)/i', $task->task_name, $matches)) {
+                        $index = min((int)$matches[1] - 1, 4);
+                        $studentData['observation'][$index] = $task->score;
+                    } elseif (preg_match('/Tugas (\d+)/i', $task->task_name, $matches)) {
+                        $index = min((int)$matches[1] - 1, 4);
+                        $studentData['homework'][$index] = $task->score;
+                    }
+                }
+                
                 $studentData['average_written'] = $grade->average_written;
                 $studentData['average_observation'] = $grade->average_observation;
                 $studentData['average_homework'] = $grade->average_homework;
@@ -190,11 +205,6 @@ class GradeExportController extends Controller
                 $studentData['final_score'] = $grade->final_score;
                 $studentData['grade_letter'] = $grade->grade_letter;
             }
-            
-            // Pastikan array memiliki data untuk semua kolom
-            $studentData['written'] = array_pad($studentData['written'], 7, '');
-            $studentData['observation'] = array_pad($studentData['observation'], 4, '');
-            $studentData['homework'] = array_pad($studentData['homework'], 5, '');
             
             $result[] = $studentData;
         }
