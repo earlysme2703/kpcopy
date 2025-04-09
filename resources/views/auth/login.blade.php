@@ -15,6 +15,7 @@
             z-index: 10;
         }
     </style>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="font-sans text-gray-900 antialiased">
     <div class="relative min-h-screen w-full">
