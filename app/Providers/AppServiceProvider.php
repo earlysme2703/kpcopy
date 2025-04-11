@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Grade;
+use App\Models\GradeTask;
+use App\Observers\GradeObserver;
+use App\Observers\GradeTaskObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        GradeTask::observe(GradeTaskObserver::class);
+        // Grade::observe(GradeObserver::class);
     }
 }

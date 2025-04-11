@@ -20,8 +20,8 @@ class GradeExportController extends Controller
     public function index()
     {
         $class = null;
-        if (auth()->user()->class_id) {
-            $class = ClassModel::find(auth()->user()->class_id);
+        if (Auth::check() && Auth::user()->class_id) {
+            $class = ClassModel::find(Auth::user()->class_id);
         }
         
         $subjects = Subject::all();
@@ -62,25 +62,52 @@ class GradeExportController extends Controller
                              ->first();
                     
                     if ($grade) {
-                        // Ambil tugas individu melalui relasi
-                        $tasks = $grade->gradeTasks;
+                        // Ambil tugas individu melalui relasi, urutkan berdasarkan created_at
+                        $tasks = $grade->gradeTasks()->orderBy('created_at')->get();
                         
                         // Log untuk debugging
                         Log::info("Grade for student {$student->name}", ['grade' => $grade->toArray()]);
                         Log::info("Tasks for student {$student->name}", ['tasks' => $tasks->toArray()]);
                         
+                        // Counter untuk setiap tipe tugas
+                        $writtenCounter = 0;
+                        $observationCounter = 0;
+                        $homeworkCounter = 0;
+                        
+                        // Array untuk menghitung rata-rata
+                        $writtenScores = [];
+                        $observationScores = [];
+                        $homeworkScores = [];
+                        
                         foreach ($tasks as $task) {
-                            if (preg_match('/Tertulis (\d+)/i', $task->task_name, $matches)) {
-                                $index = min((int)$matches[1] - 1, 4);
-                                $studentData['written'][$index] = $task->score;
-                            } elseif (preg_match('/Pengamatan (\d+)/i', $task->task_name, $matches)) {
-                                $index = min((int)$matches[1] - 1, 4);
-                                $studentData['observation'][$index] = $task->score;
-                            } elseif (preg_match('/Tugas (\d+)/i', $task->task_name, $matches)) {
-                                $index = min((int)$matches[1] - 1, 4);
-                                $studentData['homework'][$index] = $task->score;
+                            if ($task->type === 'written' && $writtenCounter < 5) {
+                                $studentData['written'][$writtenCounter] = $task->score;
+                                $writtenScores[] = $task->score;
+                                $writtenCounter++;
+                            } elseif ($task->type === 'observation' && $observationCounter < 5) {
+                                $studentData['observation'][$observationCounter] = $task->score;
+                                $observationScores[] = $task->score;
+                                $observationCounter++;
+                            } elseif ($task->type === 'homework' && $homeworkCounter < 5) {
+                                $studentData['homework'][$homeworkCounter] = $task->score;
+                                $homeworkScores[] = $task->score;
+                                $homeworkCounter++;
+                            } else {
+                                Log::warning("Unrecognized task type: {$task->type} for student {$student->name}");
                             }
                         }
+                        
+                        // Hitung rata-rata untuk setiap tipe tugas
+                        $averageWritten = !empty($writtenScores) ? array_sum($writtenScores) / count($writtenScores) : null;
+                        $averageObservation = !empty($observationScores) ? array_sum($observationScores) / count($observationScores) : null;
+                        $averageHomework = !empty($homeworkScores) ? array_sum($homeworkScores) / count($homeworkScores) : null;
+                        
+                        // Update kolom rata-rata di tabel grades
+                        $grade->update([
+                            'average_written' => $averageWritten,
+                            'average_observation' => $averageObservation,
+                            'average_homework' => $averageHomework,
+                        ]);
                         
                         $studentData['grade_details'] = [
                             'average_written' => $grade->average_written,
@@ -92,7 +119,6 @@ class GradeExportController extends Controller
                             'grade_letter' => $grade->grade_letter
                         ];
                     } else {
-                        // Log jika grade tidak ditemukan
                         Log::warning("No grade found for student {$student->name}", [
                             'student_id' => $student->id,
                             'subject_id' => $selectedSubject->id,
@@ -151,67 +177,94 @@ class GradeExportController extends Controller
     }
     
     private function getGradeData($subject_id, $semester, $class_id)
-    {
-        $students = Student::where('class_id', $class_id)->get();
-        $result = [];
+{
+    $students = Student::where('class_id', $class_id)->get();
+    $result = [];
+    
+    foreach ($students as $student) {
+        $studentData = [
+            'student_id' => $student->id,
+            'student_number' => $student->nis,
+            'name' => $student->name,
+            'written' => array_fill(0, 5, '-'),
+            'observation' => array_fill(0, 5, '-'),
+            'homework' => array_fill(0, 5, '-'),
+            'average_written' => null,
+            'average_observation' => null,
+            'average_homework' => null,
+            'midterm_score' => null,
+            'final_exam_score' => null,
+            'final_score' => null,
+            'grade_letter' => '-'
+        ];
         
-        foreach ($students as $student) {
-            $studentData = [
-                'student_id' => $student->id,
-                'student_number' => $student->nis,
-                'name' => $student->name,
-                'written' => array_fill(0, 5, '-'),
-                'observation' => array_fill(0, 5, '-'),
-                'homework' => array_fill(0, 5, '-'),
-                'average_written' => null,
-                'average_observation' => null,
-                'average_homework' => null,
-                'midterm_score' => null,
-                'final_exam_score' => null,
-                'final_score' => null,
-                'grade_letter' => '-'
-            ];
+        $grade = Grade::where('student_id', $student->id)
+                     ->where('subject_id', $subject_id)
+                     ->where('semester', $semester)
+                     ->first();
+                     
+        if ($grade) {
+            $tasks = $grade->gradeTasks()->orderBy('created_at')->get();
             
-            $grade = Grade::where('student_id', $student->id)
-                         ->where('subject_id', $subject_id)
-                         ->where('semester', $semester)
-                         ->first();
-                         
-            if ($grade) {
-                $tasks = $grade->gradeTasks;
-                
-                // Log untuk debugging
-                Log::info("Grade for student {$student->name}", ['grade' => $grade->toArray()]);
-                Log::info("Tasks for student {$student->name}", ['tasks' => $tasks->toArray()]);
-                
-                foreach ($tasks as $task) {
-                    if (preg_match('/Tertulis (\d+)/i', $task->task_name, $matches)) {
-                        $index = min((int)$matches[1] - 1, 4);
-                        $studentData['written'][$index] = $task->score;
-                    } elseif (preg_match('/Pengamatan (\d+)/i', $task->task_name, $matches)) {
-                        $index = min((int)$matches[1] - 1, 4);
-                        $studentData['observation'][$index] = $task->score;
-                    } elseif (preg_match('/Tugas (\d+)/i', $task->task_name, $matches)) {
-                        $index = min((int)$matches[1] - 1, 4);
-                        $studentData['homework'][$index] = $task->score;
-                    }
+            // Log untuk debugging
+            Log::info("Grade for student {$student->name}", ['grade' => $grade->toArray()]);
+            Log::info("Tasks for student {$student->name}", ['tasks' => $tasks->toArray()]);
+            
+            // Counter untuk setiap tipe tugas
+            $writtenCounter = 0;
+            $observationCounter = 0;
+            $homeworkCounter = 0;
+            
+            // Array untuk menghitung rata-rata
+            $writtenScores = [];
+            $observationScores = [];
+            $homeworkScores = [];
+            
+            foreach ($tasks as $task) {
+                if ($task->type === 'written' && $writtenCounter < 5) {
+                    $studentData['written'][$writtenCounter] = $task->score;
+                    $writtenScores[] = $task->score;
+                    $writtenCounter++;
+                } elseif ($task->type === 'observation' && $observationCounter < 5) {
+                    $studentData['observation'][$observationCounter] = $task->score;
+                    $observationScores[] = $task->score;
+                    $observationCounter++;
+                } elseif ($task->type === 'homework' && $homeworkCounter < 5) {
+                    $studentData['homework'][$homeworkCounter] = $task->score;
+                    $homeworkScores[] = $task->score;
+                    $homeworkCounter++;
+                } else {
+                    Log::warning("Unrecognized task type: {$task->type} for student {$student->name}");
                 }
-                
-                $studentData['average_written'] = $grade->average_written;
-                $studentData['average_observation'] = $grade->average_observation;
-                $studentData['average_homework'] = $grade->average_homework;
-                $studentData['midterm_score'] = $grade->midterm_score;
-                $studentData['final_exam_score'] = $grade->final_exam_score;
-                $studentData['final_score'] = $grade->final_score;
-                $studentData['grade_letter'] = $grade->grade_letter;
             }
             
-            $result[] = $studentData;
+            // Hitung rata-rata untuk setiap tipe tugas
+            $averageWritten = !empty($writtenScores) ? array_sum($writtenScores) / count($writtenScores) : null;
+            $averageObservation = !empty($observationScores) ? array_sum($observationScores) / count($observationScores) : null;
+            $averageHomework = !empty($homeworkScores) ? array_sum($homeworkScores) / count($homeworkScores) : null;
+            
+            // Update kolom rata-rata di tabel grades
+            $grade->update([
+                'average_written' => $averageWritten,
+                'average_observation' => $averageObservation,
+                'average_homework' => $averageHomework,
+            ]);
+            
+            $studentData['average_written'] = $grade->average_written;
+            $studentData['average_observation'] = $grade->average_observation;
+            $studentData['average_homework'] = $grade->average_homework;
+            $studentData['midterm_score'] = $grade->midterm_score;
+            $studentData['final_exam_score'] = $grade->final_exam_score;
+            $studentData['final_score'] = $grade->final_score;
+            $studentData['grade_letter'] = $grade->grade_letter;
         }
         
-        return $result;
+        $result[] = $studentData;
     }
     
+    return $result;
+}
+
     private function getDescription($grade)
     {
         switch ($grade) {
