@@ -36,7 +36,7 @@ class GradeTaskObserver
      */
     protected function updateAverages(GradeTask $gradeTask): void
     {
-        $grade = Grade::find($gradeTask->grade_id);
+        $grade = Grade::find($gradeTask->grades_id);
         if ($grade) {
             $tasks = $grade->gradeTasks;
 

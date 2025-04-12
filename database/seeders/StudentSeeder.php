@@ -10,15 +10,17 @@ class StudentSeeder extends Seeder
 {
     public function run(): void
     {
-            // Matikan foreign key check
-    DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-
-    // Truncate students (otomatis reset ID juga)
-    DB::table('students')->truncate();
-
-    // Nyalakan lagi foreign key check
-    DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-        $students = [
+        // Matikan foreign key check
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        
+        // Truncate students (otomatis reset ID juga)
+        DB::table('students')->truncate();
+        
+        // Nyalakan lagi foreign key check
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        
+        // Data manual yang sudah ada
+        $manualStudents = [
             [
                 'name' => 'Siswa 1',
                 'nis' => '1001',
@@ -51,7 +53,34 @@ class StudentSeeder extends Seeder
             ],
         ];
 
-        foreach ($students as $student) {
+        // Tambahkan data Faker
+        $faker = \Faker\Factory::create('id_ID');
+        $fakeStudents = [];
+        
+        // Generate 47 data tambahan (total 50 data)
+        for ($i = 0; $i < 47; $i++) {
+            $gender = $faker->randomElement(['L', 'P']);
+            $birthDate = $faker->dateTimeBetween('-18 years', '-15 years')->format('Y-m-d');
+            
+            $fakeStudents[] = [
+                'name' => $faker->name($gender == 'L' ? 'male' : 'female'),
+                'nis' => $faker->unique()->numerify('1###'), // Dimulai dengan 1 dan 3 digit acak
+                'gender' => $gender,
+                'class_id' => $faker->numberBetween(1, 6),
+                'parent_phone' => '62' . $faker->numerify('###########'), // Format nomor Indonesia
+                'parent_name' => $faker->name,
+                'birth_place' => $faker->city,
+                'birth_date' => $birthDate,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        // Gabungkan data manual dan faker
+        $allStudents = array_merge($manualStudents, $fakeStudents);
+        
+        // Insert semua data
+        foreach ($allStudents as $student) {
             Student::create($student);
         }
     }

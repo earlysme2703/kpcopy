@@ -7,16 +7,16 @@ use App\Models\GradeTask;
 use App\Models\Subject;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class GradeController extends Controller
 {
     // Menampilkan form input nilai tugas
     public function create()
     {
-        // Ambil semua data mata pelajaran dan siswa untuk dropdown
+        $user = Auth::user();
         $subjects = Subject::all();
-        $students = Student::all();
-
+        $students = Student::where('class_id', $user->class_id)->get();
         return view('grades.create', compact('subjects', 'students'));
     }
 
@@ -65,6 +65,7 @@ class GradeController extends Controller
 
     public function store_batch(Request $request)
     {
+        $user = Auth::user();
         // Validasi input
         $request->validate([
             'subject_id' => 'required|exists:subjects,id',
@@ -73,31 +74,34 @@ class GradeController extends Controller
             'assignment_type' => 'required|in:written,observation,homework',
             'semester' => 'required|in:odd,even',
         ]);
-        
+     
         $subjectId = $request->subject_id;
         $taskName = $request->task_name;
         $assignmentType = $request->assignment_type;
         $semester = $request->semester;
         $gradeData = json_decode($request->grade_data, true);
-        
-        // Simpan nilai untuk setiap siswa
+    
+        // Simpan nilai hanya untuk siswa di kelas wali kelas
         $count = 0;
         foreach ($gradeData as $studentId => $score) {
-            // Validasi nilai
-            if ($score < 0 || $score > 100) {
+            // Pastikan siswa berada di kelas wali kelas
+            $student = Student::where('id', $studentId)
+                             ->where('class_id', $user->class_id)
+                             ->first();
+            if (!$student || $score < 0 || $score > 100) {
                 continue;
             }
-            
-            // Buat atau ambil data grade terlebih dahulu
+    
+            // Buat atau ambil data grade
             $grade = Grade::updateOrCreate(
                 [
                     'student_id' => $studentId,
                     'subject_id' => $subjectId,
                     'semester' => $semester
                 ],
-                ['score' => $score] // Nilai awal, akan diupdate nanti
+                ['score' => $score]
             );
-            
+    
             // Simpan nilai ke tabel grade_tasks
             GradeTask::create([
                 'subject_id' => $subjectId,
@@ -105,15 +109,13 @@ class GradeController extends Controller
                 'score' => $score,
                 'student_id' => $studentId,
                 'type' => $assignmentType,
-                'grades_id' => $grade->id, // Menambahkan grades_id
+                'grades_id' => $grade->id,
             ]);
-            
-            // Update nilai rata-rata di tabel grades
+    
             $this->updateAverageGrade($studentId, $subjectId, $semester);
-            
             $count++;
         }
-        
+    
         return redirect()->back()->with('success', "Berhasil menyimpan nilai untuk {$count} siswa.");
     }
 
