@@ -30,8 +30,6 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
-        GradeTask::observe(GradeTaskObserver::class);
-        Grade::observe(GradeObserver::class);
         $this->optimizeEloquent();
     }
     

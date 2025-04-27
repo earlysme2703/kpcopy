@@ -1,17 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800">Siswa Kelas {{ $class->name }}</h2>
+        <h2 class="text-xl font-semibold leading-tight text-gray-800">Siswa {{ $class->name }}</h2>
     </x-slot>
 
     <div class="py-6" x-data="walikelas()">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-medium text-gray-700">Daftar Siswa</h3>
-                <div class="text-sm text-gray-600 bg-gray-100 p-2 rounded-md">
-                    <span class="font-medium">Petunjuk:</span> Sebagai Wali Kelas, Anda dapat mengedit nomor telepon orang tua siswa.
-                </div>
-            </div>
-
             @if(session('success'))
                 <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-md shadow-sm">
                     <div class="flex">
@@ -23,7 +16,14 @@
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+            <!-- Satu container putih untuk Petunjuk, teks Daftar Siswa, dan tabel -->
+            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-medium text-gray-700">Daftar Siswa</h3>
+                    <div class="text-sm text-gray-600">
+                        <span class="font-medium">Petunjuk:</span> Sebagai Wali Kelas, Anda dapat mengedit nomor telepon orang tua siswa.
+                    </div>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -53,10 +53,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $student->parent_name ?? '-' }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $student->parent_phone ?? '-' }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button @click="openEditModal({{ json_encode($student) }})" class="text-indigo-600 hover:text-indigo-900">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                            </svg>
+                                        <button @click="openEditModal({{ json_encode($student) }})" class="text-indigo-600 hover:text-indigo-900 underline">
                                             Edit No HP
                                         </button>
                                     </td>
@@ -68,7 +65,7 @@
             </div>
         </div>
 
-        {{-- Modal Edit Nomor Telepon --}}
+        <!-- Modal Edit Nomor Telepon -->
         <div x-show="openModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" x-cloak>
             <div class="bg-white p-6 rounded-lg w-full max-w-md relative" @click.away="openModal = false">
                 <h3 class="text-lg font-bold mb-4">Edit Nomor HP Orang Tua</h3>
@@ -104,11 +101,10 @@
                     parent_phone: ''
                 },
                 phoneError: '',
-                rawPhoneInput: '', // Untuk menyimpan input asli user
+                rawPhoneInput: '',
                 
                 openEditModal(student) {
                     this.selectedStudent = { ...student };
-                    // Convert 62 to 0 for display
                     this.rawPhoneInput = this.selectedStudent.parent_phone?.startsWith('62') 
                         ? '0' + this.selectedStudent.parent_phone.slice(2) 
                         : this.selectedStudent.parent_phone || '';
@@ -117,10 +113,8 @@
                 },
                 
                 handlePhoneInput() {
-                    // Simpan input asli user
                     this.rawPhoneInput = this.$refs.phoneInput.value;
                     
-                    // Konversi ke format 62 untuk disimpan
                     let phoneNumber = this.rawPhoneInput.replace(/\D/g, '');
                     if (phoneNumber.startsWith('0')) {
                         this.selectedStudent.parent_phone = '62' + phoneNumber.substring(1);
@@ -132,7 +126,7 @@
                 },
                 
                 validateAndSubmit(e) {
-                    this.handlePhoneInput(); // Pastikan konversi terakhir
+                    this.handlePhoneInput();
                     
                     if (!this.selectedStudent.parent_phone) {
                         this.phoneError = 'Nomor HP tidak boleh kosong';

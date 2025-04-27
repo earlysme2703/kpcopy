@@ -61,7 +61,7 @@
             <div class="max-w-6xl mx-auto px-4">
                 <div class="flex justify-between items-center py-4">
                     <div class="text-xl font-semibold text-slate-900 ml-3">
-                        Emang ini laravel?
+                        Ini Text dan logo sekolah
                     </div>
                     <div class="flex space-x-4 mr-4">
                         @auth
@@ -205,45 +205,45 @@
                 <div id="scroll-container" class="flex space-x-6 pb-6 overflow-x-auto scroll-smooth cursor-grab no-select">
                     <!-- Kartu Kepala Sekolah -->
                     <div class="flex-shrink-0 w-64 bg-gray-50 p-6 rounded-lg shadow-lg text-center transition-all hover:shadow-xl hover:transform hover:-translate-y-2">
-                        <img src="https://th.bing.com/th/id/OIP.bhmCGGf0Va5dPb63I3TE9AHaHa?w=186&h=186&c=7&r=0&o=5&dpr=1.7&pid=1.7" alt="Kepala Sekolah" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
+                        <img src="https://cdn.mos.cms.futurecdn.net/HQYEyLWmndywnfzg4xnQ5R-1200-80.jpg" alt="Kepala Sekolah" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
                         <h3 class="text-xl font-semibold mb-2 text-gray-800">John Doe</h3>
                         <p class="text-gray-700">Kepala Sekolah</p>
                     </div>
                     <!-- Kartu Guru 1 -->
                     <div class="flex-shrink-0 w-64 bg-gray-50 p-6 rounded-lg shadow-lg text-center transition-all hover:shadow-xl hover:transform hover:-translate-y-2">
-                        <img src="https://source.unsplash.com/200x200/?teacher,man" alt="Guru 1" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
+                        <img src="https://cdn.mos.cms.futurecdn.net/HQYEyLWmndywnfzg4xnQ5R-1200-80.jpg" alt="Guru 1" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
                         <h3 class="text-xl font-semibold mb-2 text-gray-800">Jane Smith</h3>
-                        <p class="text-gray-700">Guru Matematika</p>
+                        <p class="text-gray-700">Guru Kelas 1</p>
                     </div>
                     <!-- Kartu Guru 2 -->
                     <div class="flex-shrink-0 w-64 bg-gray-50 p-6 rounded-lg shadow-lg text-center transition-all hover:shadow-xl hover:transform hover:-translate-y-2">
                         <img src="https://cdn.mos.cms.futurecdn.net/HQYEyLWmndywnfzg4xnQ5R-1200-80.jpg" alt="Guru 2" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
                         <h3 class="text-xl font-semibold mb-2 text-gray-800">Alice Johnson</h3>
-                        <p class="text-gray-700">Guru Bahasa Inggris</p>
+                        <p class="text-gray-700">Guru Kelas 2</p>
                     </div>
                     <!-- Kartu Guru 3 -->
                     <div class="flex-shrink-0 w-64 bg-gray-50 p-6 rounded-lg shadow-lg text-center transition-all hover:shadow-xl hover:transform hover:-translate-y-2">
-                        <img src="https://source.unsplash.com/200x200/?teacher,man" alt="Guru 3" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
+                        <img src="https://cdn.mos.cms.futurecdn.net/HQYEyLWmndywnfzg4xnQ5R-1200-80.jpg" alt="Guru 3" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
                         <h3 class="text-xl font-semibold mb-2 text-gray-800">Bob Brown</h3>
-                        <p class="text-gray-700">Guru IPA</p>
+                        <p class="text-gray-700">Guru Kelas 3</p>
                     </div>
                     <!-- Kartu Guru 4 -->
                     <div class="flex-shrink-0 w-64 bg-gray-50 p-6 rounded-lg shadow-lg text-center transition-all hover:shadow-xl hover:transform hover:-translate-y-2">
-                        <img src="https://source.unsplash.com/200x200/?teacher,woman" alt="Guru 4" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
+                        <img src="https://cdn.mos.cms.futurecdn.net/HQYEyLWmndywnfzg4xnQ5R-1200-80.jpg" alt="Guru 4" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
                         <h3 class="text-xl font-semibold mb-2 text-gray-800">Eva Green</h3>
-                        <p class="text-gray-700">Guru Seni</p>
+                        <p class="text-gray-700">Guru Kelas 4</p>
                     </div>
                     <!-- Kartu Guru 5 -->
                     <div class="flex-shrink-0 w-64 bg-gray-50 p-6 rounded-lg shadow-lg text-center transition-all hover:shadow-xl hover:transform hover:-translate-y-2">
-                        <img src="https://source.unsplash.com/200x200/?teacher,man" alt="Guru 5" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
+                        <img src="https://cdn.mos.cms.futurecdn.net/HQYEyLWmndywnfzg4xnQ5R-1200-80.jpg" alt="Guru 5" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
                         <h3 class="text-xl font-semibold mb-2 text-gray-800">Michael Lee</h3>
-                        <p class="text-gray-700">Guru Olahraga</p>
+                        <p class="text-gray-700">Guru Kelas 5</p>
                     </div>
                     <!-- Kartu Guru 6 -->
                     <div class="flex-shrink-0 w-64 bg-gray-50 p-6 rounded-lg shadow-lg text-center transition-all hover:shadow-xl hover:transform hover:-translate-y-2">
-                        <img src="https://source.unsplash.com/200x200/?teacher,woman" alt="Guru 6" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
+                        <img src="https://cdn.mos.cms.futurecdn.net/HQYEyLWmndywnfzg4xnQ5R-1200-80.jpg" alt="Guru 6" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover">
                         <h3 class="text-xl font-semibold mb-2 text-gray-800">Sarah Connor</h3>
-                        <p class="text-gray-700">Guru Sejarah</p>
+                        <p class="text-gray-700">Guru Kelas 6</p>
                     </div>
                 </div>
             </div>

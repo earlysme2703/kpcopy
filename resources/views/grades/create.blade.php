@@ -7,22 +7,22 @@
         </div>
     </x-slot>
 
-    <div class="container mx-auto px-4 py-6 max-w-4xl">
+    <div class="container ml-6 mr-20 py-10 max-w-4xl">
         <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-100">
-            <!-- Header Section -->
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
-                <h4 class="text-lg font-semibold text-gray-800 flex items-center">
-                    <span class="iconify mr-2" data-icon="mdi:file-document-edit-outline" style="color: #4f46e5;"></span>
-                    Form Input Nilai
-                </h4>
-            </div>
-
             <!-- Main Form Content -->
-            <div class="p-6">
+            <div class="p-10">
+                <div id="alertContainer"></div>
                 @if(session('success'))
                     <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded flex items-center">
                         <span class="iconify mr-2" data-icon="mdi:check-circle-outline"></span>
                         <span>{{ session('success') }}</span>
+                    </div>
+                @endif
+                
+                @if(session('error'))
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded flex items-center">
+                        <span class="iconify mr-2" data-icon="mdi:alert-circle-outline"></span>
+                        <span>{{ session('error') }}</span>
                     </div>
                 @endif
                 
@@ -125,8 +125,7 @@
                                                 class="score-input w-full h-8 px-2 text-center rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-150"
                                                 placeholder="0-100"
                                                 data-next="{{ $index < count($students) - 1 ? $index + 1 : 0 }}"
-                                                onkeydown="handleEnterKey(event, this)"
-                                                oninput="validateScore(this)">
+                                                data-student-id="{{ $student->id }}">
                                         </td>
                                     </tr>
                                     @endforeach
@@ -158,10 +157,47 @@
     </div>
     
     <script>
+    // Lazy initialization for better performance
     document.addEventListener('DOMContentLoaded', function() {
+        // Inisialisasi variabel untuk throttling input
+        let throttleTimer;
+        const throttleDelay = 300; // ms
+        
         // Submit form handler
         const submitBtn = document.getElementById('submitBtn');
         const gradeForm = document.getElementById('gradeForm');
+        
+        // Efisiensi event handler dengan event delegation
+        const studentTableBody = document.getElementById('studentTableBody');
+        studentTableBody.addEventListener('keydown', function(event) {
+            if (event.target.classList.contains('score-input') && event.key === 'Enter') {
+                event.preventDefault();
+                const nextIndex = event.target.getAttribute('data-next');
+                const nextInput = document.querySelectorAll('.score-input')[nextIndex];
+                
+                if (nextInput) {
+                    nextInput.focus();
+                    nextInput.select();
+                }
+            }
+        });
+        
+        // Hanya validasi saat focus out untuk mengurangi overhead
+        studentTableBody.addEventListener('focusout', function(event) {
+            if (event.target.classList.contains('score-input')) {
+                validateScore(event.target);
+            }
+        });
+        
+        // Throttled input handler untuk performa yang lebih baik
+        studentTableBody.addEventListener('input', function(event) {
+            if (event.target.classList.contains('score-input')) {
+                clearTimeout(throttleTimer);
+                throttleTimer = setTimeout(function() {
+                    validateScore(event.target);
+                }, throttleDelay);
+            }
+        });
         
         submitBtn.addEventListener('click', function() {
             const subjectId = document.getElementById('subject_id').value;
@@ -178,9 +214,10 @@
             const scoreInputs = document.querySelectorAll('.score-input');
             let hasValue = false;
             
-            scoreInputs.forEach(input => {
-                const studentId = input.name.match(/\[(\d+)\]/)[1];
+            // Gunakan method modern untuk looping lebih efisien
+            Array.from(scoreInputs).forEach(input => {
                 if (input.value) {
+                    const studentId = input.dataset.studentId;
                     scores[studentId] = input.value;
                     hasValue = true;
                 }
@@ -191,6 +228,7 @@
                 return;
             }
             
+            // Set form values
             document.getElementById('form_subject_id').value = subjectId;
             document.getElementById('form_task_name').value = taskName;
             document.getElementById('form_assignment_type').value = assignmentType;
@@ -204,6 +242,7 @@
                 Menyimpan...
             `;
             
+            // Submit form
             gradeForm.submit();
         });
     });
@@ -212,6 +251,7 @@
         const taskType = document.getElementById('task_type').value;
         const taskNameInput = document.getElementById('task_name');
         
+        // Gunakan object literal daripada switch/case untuk performa lebih baik
         const taskNames = {
             'nilai_harian_1': 'Nilai Harian 1',
             'nilai_harian_2': 'Nilai Harian 2',
@@ -231,19 +271,6 @@
         }
     }
 
-    function handleEnterKey(event, input) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            const nextIndex = input.getAttribute('data-next');
-            const nextInput = document.querySelectorAll('.score-input')[nextIndex];
-            
-            if (nextInput) {
-                nextInput.focus();
-                nextInput.select();
-            }
-        }
-    }
-
     function validateScore(input) {
         let value = parseInt(input.value);
         if (isNaN(value)) {
@@ -256,8 +283,11 @@
     }
 
     function showAlert(type, message) {
+        // Gunakan container khusus untuk alert
+        const alertContainer = document.getElementById('alertContainer');
+        
         // Remove existing alerts first
-        const existingAlert = document.querySelector('.alert-message');
+        const existingAlert = alertContainer.querySelector('.alert-message');
         if (existingAlert) existingAlert.remove();
         
         const alertDiv = document.createElement('div');
@@ -269,9 +299,9 @@
             </div>
         `;
         
-        const form = document.querySelector('.p-6');
-        form.insertBefore(alertDiv, form.firstChild);
+        alertContainer.appendChild(alertDiv);
         
+        // Hapus alert setelah 5 detik dengan animasi
         setTimeout(() => {
             alertDiv.classList.add('opacity-0', 'transition-opacity', 'duration-300');
             setTimeout(() => alertDiv.remove(), 300);
