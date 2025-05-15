@@ -3,7 +3,7 @@
     x-cloak x-data="sidebar()" :class="isOpen ? 'w-64' : 'w-20'" @mouseleave="handleMouseLeave()">
     <!-- Logo Section -->
     <div class="flex items-center px-2 mb-6 h-16">
-        <img src="https://ucarecdn.com/60bcc816-2da9-4f6a-ab6e-b926d11341e1/LogoTutWuriHandayani.png" alt="Logo"
+        <img src="https://ucarecdn.com/140db37d-4117-4b98-bc00-20e8d0147903/WhatsApp_Image_20250430_at_105328_AM__1_removebgpreview.png" alt="Logo"
             class="w-10 h-auto min-w-[40px] flex-shrink-0" />
         <div class="overflow-hidden transition-opacity duration-300"
             :class="isOpen ? 'w-auto opacity-100 ml-5' : 'w-0 opacity-0'">
