@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Web Pengelolaan Nilai') }} - Login</title>
-
+    <title>{{ config('app.name', 'Sistem Pengelolaan Nilai SDN Cijedil') }} - Login</title>
+    <link rel="icon" type="image/png" href="https://ucarecdn.com/140db37d-4117-4b98-bc0
+    System: 0-20e8d0147903/WhatsApp_Image_20250430_at_105328_AM__1_removebgpreview.png">
     <style>
         .clip-trapezoid {
             clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0% 100%);
@@ -14,7 +15,7 @@
             z-index: 10;
         }
     </style>
- @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans text-gray-900 antialiased">
     <div class="relative min-h-screen w-full">
@@ -26,19 +27,18 @@
             <!-- Navbar -->
             <div class="absolute top-6 left-6 flex items-center z-10 px-3">
                 <img src="https://ucarecdn.com/140db37d-4117-4b98-bc00-20e8d0147903/WhatsApp_Image_20250430_at_105328_AM__1_removebgpreview.png" alt="Logo SDN CIJEDIL" class="w-10 h-10">
-                <span class="text-white font-semibold ml-2 text-lg">SDN CIJEDIL</span>
+                <span class="text-white font-semibold ml-2 text-lg">SDN Cijedil</span>
             </div>
 
             <!-- Konten -->
             <div class="relative z-10 px-12 pt-24 text-slate-200">
-                <h1 class="text-4xl font-bold mb-4">WEBSITE PENGELOLAAN<br>NILAI SISWA</h1>
-                <p class="text-sm mb-10">Lorem ipsum dolor sit amet.</p>
+                <h1 class="text-4xl font-bold mb-4">Sistem Pengelolaan Nilai<br>SDN Cijedil</h1>
             </div>
-            <div class="relative z-10 px-12 pt-52 text-white">
-                <p>
-                    Lorem Ipsum Dolor Sit Amet<br>
-                    consectetur adipiscing elit. Vivamus lacinia odio<br>
-                    vitae vestibulum vestibulum.
+            <div class="absolute bottom-12 z-10 px-12 text-white w-full">
+                <p class="text-sm">
+                    SDN Cijedil<br>
+                    Solusi digital untuk pengelolaan nilai siswa yang efisien dan terpercaya, <br>
+                    mendukung peningkatan mutu pendidikan.
                 </p>
             </div>
         </div>
@@ -47,7 +47,6 @@
         <div class="absolute top-0 right-0 bottom-0 h-full w-full md:w-2/4 pl-20 text-white px-8 py-12 flex flex-col 
         justify-center items-center clip-trapezoid shadow-2xl backdrop-blur-md bg-opacity-90 bg-gradient-to-b from-[#030330] to-[#03044b]">
             <h2 class="text-3xl font-bold mb-6">Masuk Akun</h2>
-            {{-- <p class="text-blue-100 mb-6">Selamat datang kembali! Silakan masukkan data Anda.</p> --}}
 
             <form method="POST" action="{{ route('login') }}" class="w-full max-w-sm pl-6 pr-6">
                 @csrf
@@ -118,7 +117,6 @@
                     Masuk
                 </button>
             </form>
-
         </div>
     </div>
 </body>

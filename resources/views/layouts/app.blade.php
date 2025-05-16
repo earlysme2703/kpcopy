@@ -8,7 +8,7 @@
 
     <title>{{ config('app.name', 'Website Pengelolaan Nilai') }}</title>
     <link rel="icon" type="image/png"
-        href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEium4wXO9XSBY9kNJgBmFxlOEgKk4tOaOrnWOM3LL3NG4PAEMnb9vbunblwPifY72AM_AhW6iJJ9EAxSPDc20S8Xp0-csqDlGVk3e-YXTwdbE5EUmrkyXDKWU2OIg_5EG_Dg27xjuyfn_EP/s1600/Logo+Tut+Wuri+Handayani.png">
+        href="https://ucarecdn.com/140db37d-4117-4b98-bc00-20e8d0147903/WhatsApp_Image_20250430_at_105328_AM__1_removebgpreview.png">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">

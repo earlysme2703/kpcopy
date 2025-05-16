@@ -23,10 +23,15 @@ class ProfileController extends Controller
 
     /**
      * Update the user's profile information.
+     *
+     * @param \App\Http\Requests\ProfileUpdateRequest|\Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+        $user->fill($request->validated());
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;

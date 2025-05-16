@@ -7,111 +7,111 @@
         </div>
     </x-slot>
 
-    <div class="container mx-auto px-4 py-8 max-w-5xl">
-        <!-- Notification Section -->
-        <div id="alertContainer" class="mb-6"></div>
-        
-        @if(session('success'))
-            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded flex items-center">
-                <span class="iconify mr-2" data-icon="mdi:check-circle-outline"></span>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
-        
-        @if(session('error'))
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded flex items-center">
-                <span class="iconify mr-2" data-icon="mdi:alert-circle-outline"></span>
-                <span>{{ session('error') }}</span>
-            </div>
-        @endif
+    <!-- Add CSRF Meta Tag for AJAX Requests -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <!-- Main Card -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <!-- Card Header -->
-            <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Form Input Nilai Siswa</h3>
-            </div>
-            
-            <!-- Card Content -->
-            <div class="p-6">
-                <!-- Subject and Semester Selection -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <!-- Subject Selection -->
-                    <div>
-                        <label for="subject_id" class="block text-sm font-medium text-gray-700 mb-2">Mata Pelajaran *</label>
-                        <select id="subject_id" 
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 h-10 pl-3 pr-8"
-                            required>
-                            <option value="">Pilih Mata Pelajaran</option>
-                            @foreach($subjects as $subject)
-                                <option value="{{ $subject->id }}">{{ $subject->name }}</option>
-                            @endforeach
-                        </select>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
+                <!-- Notification Section -->
+                <div id="alertContainer" class="mb-6"></div>
+                
+                @if(session('success'))
+                    <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded flex items-center">
+                        <span class="iconify mr-2" data-icon="mdi:check-circle-outline"></span>
+                        <span>{{ session('success') }}</span>
+                    </div>
+                @endif
+                
+                @if(session('error'))
+                    <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded flex items-center">
+                        <span class="iconify mr-2" data-icon="mdi:alert-circle-outline"></span>
+                        <span>{{ session('error') }}</span>
+                    </div>
+                @endif
+
+                <!-- Filter Section -->
+                <div class="mb-8 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-lg font-medium mb-4 text-gray-700 border-b pb-2">Form Input Nilai Siswa</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Subject Selection -->
+                        <div>
+                            <label for="subject_id" class="block text-sm font-medium text-gray-700">Mata Pelajaran *</label>
+                            <select id="subject_id" 
+                                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                                required>
+                                <option value="">Pilih Mata Pelajaran</option>
+                                @foreach($subjects as $subject)
+                                    <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Semester Selection -->
+                        <div>
+                            <label for="semester" class="block text-sm font-medium text-gray-700">Semester *</label>
+                            <select id="semester" 
+                                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                                required>
+                                <option value="odd" selected>Gasal</option>
+                                <option value="even">Genap</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Task Type Selection -->
+                        <div>
+                            <label for="task_type" class="block text-sm font-medium text-gray-700">Jenis Tugas *</label>
+                            <select id="task_type" 
+                                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                                onchange="updateTaskName()">
+                                <option value="">Pilih Jenis Tugas</option>
+                                <option value="nilai_harian_1">Nilai Harian 1</option>
+                                <option value="nilai_harian_2">Nilai Harian 2</option>
+                                <option value="nilai_harian_3">Nilai Harian 3</option>
+                                <option value="uts">UTS</option>
+                                <option value="uas">UAS</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <!-- Semester Selection -->
-                    <div>
-                        <label for="semester" class="block text-sm font-medium text-gray-700 mb-2">Semester *</label>
-                        <select id="semester" 
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 h-10 pl-3 pr-8"
-                            required>
-                            <option value="odd" selected>Gasal</option>
-                            <option value="even">Genap</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Task Type Selection -->
-                    <div>
-                        <label for="task_type" class="block text-sm font-medium text-gray-700 mb-2">Jenis Tugas *</label>
-                        <select id="task_type" 
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 h-10 pl-3 pr-8"
-                            onchange="updateTaskName()">
-                            <option value="">Pilih Jenis Tugas</option>
-                            <option value="nilai_harian_1">Nilai Harian 1</option>
-                            <option value="nilai_harian_2">Nilai Harian 2</option>
-                            <option value="nilai_harian_3">Nilai Harian 3</option>
-                            <option value="uts">UTS</option>
-                            <option value="uas">UAS</option>
-                            <option value="custom">Custom</option>
-                        </select>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <!-- Task Name -->
+                        <div>
+                            <label for="task_name" class="block text-sm font-medium text-gray-700">Nama Tugas *</label>
+                            <input type="text" id="task_name" 
+                                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                                required>
+                        </div>
+                        
+                        <!-- Assignment Type -->
+                        <div>
+                            <label for="assignment_type" class="block text-sm font-medium text-gray-700">Tipe Tugas *</label>
+                            <select id="assignment_type" 
+                                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                                required>
+                                <option value="">Pilih Tipe Tugas</option>
+                                <option value="written">Tertulis</option>
+                                <option value="observation">Pengamatan</option>
+                                <option value="homework">PR</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                
-                <!-- Task Details -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <!-- Task Name -->
-                    <div>
-                        <label for="task_name" class="block text-sm font-medium text-gray-700 mb-2">Nama Tugas *</label>
-                        <input type="text" id="task_name" 
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 h-10 px-3"
-                            required>
-                    </div>
-                    
-                    <!-- Assignment Type -->
-                    <div>
-                        <label for="assignment_type" class="block text-sm font-medium text-gray-700 mb-2">Tipe Tugas *</label>
-                        <select id="assignment_type" 
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 h-10 pl-3 pr-8"
-                            required>
-                            <option value="">Pilih Tipe Tugas</option>
-                            <option value="written">Tertulis</option>
-                            <option value="observation">Pengamatan</option>
-                            <option value="homework">PR</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- Students Table -->
-                <div class="mb-8">
-                    <div class="flex justify-between items-center mb-4">
-                        <h4 class="font-medium text-gray-700 text-lg">Daftar Siswa</h4>
-                        <span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">{{ count($students) }} siswa</span>
-                    </div>
-                    
-                    <div class="bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
+
+                <!-- Students Table and Form -->
+                @if(count($students) > 0)
+                    <form action="{{ route('grades.store_batch') }}" method="POST" id="gradeForm">
+                        @csrf
+                        <input type="hidden" name="subject_id" id="form_subject_id">
+                        <input type="hidden" name="task_name" id="form_task_name">
+                        <input type="hidden" name="grade_data" id="grade_data">
+                        <input type="hidden" name="assignment_type" id="form_assignment_type">
+                        <input type="hidden" name="semester" id="form_semester">
+
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-100">
+                                <thead class="bg-gray-50">
                                     <tr>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">No</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Siswa</th>
@@ -120,65 +120,60 @@
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200" id="studentTableBody">
                                     @foreach($students as $index => $student)
-                                    <tr class="hover:bg-gray-50 transition" data-student-id="{{ $student->id }}">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $index + 1 }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-gray-900">{{ $student->name }}</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <input type="number" 
-                                                name="scores[{{ $student->id }}]" 
-                                                min="0" 
-                                                max="100"
-                                                class="score-input w-full h-9 px-3 text-center rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-150"
-                                                placeholder="0-100"
-                                                data-next="{{ $index < count($students) - 1 ? $index + 1 : 0 }}"
-                                                data-student-id="{{ $student->id }}">
-                                        </td>
-                                    </tr>
+                                        <tr class="{{ $index % 2 == 0 ? 'bg-white' : 'bg-gray-50' }}" data-student-id="{{ $student->id }}">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $index + 1 }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900">{{ $student->name }}</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <input type="number" 
+                                                    name="scores[{{ $student->id }}]" 
+                                                    min="0" 
+                                                    max="100"
+                                                    class="score-input w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-center py-2"
+                                                    placeholder="0-100"
+                                                    data-next="{{ $index < count($students) - 1 ? $index + 1 : 0 }}"
+                                                    data-student-id="{{ $student->id }}">
+                                            </td>
+                                        </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- Submit Form -->
-                <form action="{{ route('grades.store_batch') }}" method="POST" id="gradeForm">
-                    @csrf
-                    <input type="hidden" name="subject_id" id="form_subject_id">
-                    <input type="hidden" name="task_name" id="form_task_name">
-                    <input type="hidden" name="grade_data" id="grade_data">
-                    <input type="hidden" name="assignment_type" id="form_assignment_type">
-                    <input type="hidden" name="semester" id="form_semester">
-                    
-                    <div class="mt-8 flex flex-col sm:flex-row gap-4">
-                        <!-- Save Button -->
-                        <button type="button" id="submitBtn"
-                            class="flex-1 py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 flex items-center justify-center">
-                            <span class="iconify mr-2" data-icon="mdi:content-save"></span>
-                            Simpan Nilai
-                        </button>
 
-                        <!-- Reset Button -->
-                        <button type="button" id="resetBtn"
-                            class="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 flex items-center justify-center">
-                            <span class="iconify mr-2" data-icon="mdi:refresh"></span>
-                            Reset Form
-                        </button>
+                <!-- Buttons Inside Container, Below Table, Right-Aligned -->
+            <div class="mt-6 flex justify-end gap-2">
+                <!-- Save Button -->
+                <button type="button" id="submitBtn"
+                    class="inline-flex items-center px-4 py-2 border border-indigo-700 text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+                    <span class="iconify mr-2 text-lg" data-icon="mdi:content-save"></span>
+                    Simpan
+                </button>
 
-                        <!-- Back Button -->
-                        <a href="{{ url()->previous() }}"
-                            class="flex-1 py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 flex items-center justify-center text-center">
-                            <span class="iconify mr-2" data-icon="mdi:arrow-left"></span>
-                            Kembali
-                        </a>
+                <!-- Reset Button -->
+                <button type="button" id="resetBtn"
+                    class="inline-flex items-center px-4 py-2 border border-red-700 text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
+                    <span class="iconify mr-2 text-lg" data-icon="mdi:refresh"></span>
+                    Reset
+                </button>
+            </div>
+                    </form>
+                @else
+                    <div class="py-8 text-center">
+                        <div class="bg-yellow-50 p-4 rounded-md border border-yellow-100">
+                            <p class="text-yellow-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                Tidak ada siswa yang tersedia untuk input nilai.
+                            </p>
+                        </div>
                     </div>
-                </form>
+                @endif
             </div>
         </div>
     </div>
-    
+
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Throttle configuration
@@ -192,33 +187,35 @@
         const resetBtn = document.getElementById('resetBtn');
 
         // Event delegation for student table
-        studentTableBody.addEventListener('keydown', function(event) {
-            if (event.target.classList.contains('score-input') && event.key === 'Enter') {
-                event.preventDefault();
-                const nextIndex = event.target.getAttribute('data-next');
-                const nextInput = document.querySelectorAll('.score-input')[nextIndex];
-                
-                if (nextInput) {
-                    nextInput.focus();
-                    nextInput.select();
+        if (studentTableBody) {
+            studentTableBody.addEventListener('keydown', function(event) {
+                if (event.target.classList.contains('score-input') && event.key === 'Enter') {
+                    event.preventDefault();
+                    const nextIndex = event.target.getAttribute('data-next');
+                    const nextInput = document.querySelectorAll('.score-input')[nextIndex];
+                    
+                    if (nextInput) {
+                        nextInput.focus();
+                        nextInput.select();
+                    }
                 }
-            }
-        });
+            });
 
-        studentTableBody.addEventListener('focusout', function(event) {
-            if (event.target.classList.contains('score-input')) {
-                validateScore(event.target);
-            }
-        });
-
-        studentTableBody.addEventListener('input', function(event) {
-            if (event.target.classList.contains('score-input')) {
-                clearTimeout(throttleTimer);
-                throttleTimer = setTimeout(function() {
+            studentTableBody.addEventListener('focusout', function(event) {
+                if (event.target.classList.contains('score-input')) {
                     validateScore(event.target);
-                }, throttleDelay);
-            }
-        });
+                }
+            });
+
+            studentTableBody.addEventListener('input', function(event) {
+                if (event.target.classList.contains('score-input')) {
+                    clearTimeout(throttleTimer);
+                    throttleTimer = setTimeout(function() {
+                        validateScore(event.target);
+                    }, throttleDelay);
+                }
+            });
+        }
 
         // Submit button handler
         submitBtn.addEventListener('click', function() {
@@ -259,7 +256,7 @@
             // Show loading state
             submitBtn.disabled = true;
             submitBtn.innerHTML = `
-                <span class="iconify mr-2 animate-spin" data-icon="mdi:loading"></span>
+                <span class="iconify w-3 h-3 mr-1 animate-spin" data-icon="mdi:loading"></span>
                 Menyimpan...
             `;
             
@@ -284,7 +281,7 @@
             // Focus to first field
             document.getElementById('subject_id').focus();
             
-            showAlert('info', 'Form telah direset');
+            showAlert('success', 'Form telah direset');
         });
     });
 
@@ -330,13 +327,13 @@
         
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert-message mb-4 p-4 rounded-lg border-l-4 ${type === 'error' ? 'bg-red-50 border-red-500 text-red-700' : 
-                              type === 'info' ? 'bg-blue-50 border-blue-500 text-blue-700' : 
-                              'bg-green-50 border-green-500 text-green-700'}`;
+                              type === 'success' ? 'bg-green-50 border-green-500 text-green-700' : 
+                              'bg-blue-50 border-blue-500 text-blue-700'}`;
         alertDiv.innerHTML = `
             <div class="flex items-center">
                 <span class="iconify mr-2" data-icon="mdi:${type === 'error' ? 'alert-circle-outline' : 
-                                      type === 'info' ? 'information-outline' : 
-                                      'check-circle-outline'}"></span>
+                                      type === 'success' ? 'check-circle-outline' : 
+                                      'information-outline'}"></span>
                 <span>${message}</span>
             </div>
         `;
@@ -344,19 +341,28 @@
         alertContainer.appendChild(alertDiv);
         
         setTimeout(() => {
-            alertDiv.classList.add('opacity-0', 'transition-opacity', 'duration-300');
-            setTimeout(() => alertDiv.remove(), 300);
+            alertDiv.remove();
         }, 5000);
     }
     </script>
 
     <style>
-    .score-input {
-        transition: all 0.15s ease-in-out;
-    }
-    .score-input:focus {
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        border-color: rgba(99, 102, 241, 0.8);
-    }
+        .score-input {
+            transition: all 0.15s ease-in-out;
+            /* Menghilangkan spinner untuk input number */
+            -webkit-appearance: none;
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        .score-input:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.8);
+        }
+        /* Menghilangkan spinner untuk browser WebKit */
+        .score-input::-webkit-inner-spin-button,
+        .score-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
     </style>
 </x-app-layout>

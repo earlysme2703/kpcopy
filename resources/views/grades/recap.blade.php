@@ -10,8 +10,6 @@
         </div>
     </x-slot>
 
-    <!-- Add CSRF Meta Tag for AJAX Requests -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -22,27 +20,7 @@
                     <h3 class="text-lg font-medium mb-4 text-gray-700 border-b pb-2">Filter Data Nilai</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {{-- Jika user adalah Admin, tampilkan dropdown kelas --}}
-                        @if (auth()->user()->role_id == 1) {{-- Admin --}}
-                            <div>
-                                <form action="{{ route('grades.recap') }}" method="GET" class="space-y-2">
-                                    <label for="class_id" class="block text-sm font-medium text-gray-700">Pilih
-                                        Kelas:</label>
-                                    <select id="class_id" name="class_id"
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                                        onchange="this.form.submit()">
-                                        <option disabled selected>Pilih Kelas</option>
-                                        @foreach ($classes as $class)
-                                            <option value="{{ $class->id }}"
-                                                {{ request('class_id') == $class->id ? 'selected' : '' }}>
-                                                {{ $class->name ?? 'Kelas ' . $class->id }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </form>
-                            </div>
-                        @endif
-
+                     
                         {{-- Pilihan Mata Pelajaran & Jenis Tugas jika kelas sudah dipilih --}}
                         @if ($class_id)
                             <div>

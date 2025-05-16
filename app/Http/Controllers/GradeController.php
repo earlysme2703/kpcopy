@@ -34,45 +34,45 @@ class GradeController extends Controller
     // Menyimpan data nilai tugas yang baru
     public function store(Request $request)
     {
-        // Validasi input dari form
-        $validated = $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'task_name' => 'required|string',
-            'score' => 'required|numeric',
-            'assignment_type' => 'required|in:written,observation,homework',
-            'semester' => 'required|in:odd,even',
-        ]);
+        // // Validasi input dari form
+        // $validated = $request->validate([
+        //     'student_id' => 'required|exists:students,id',
+        //     'subject_id' => 'required|exists:subjects,id',
+        //     'task_name' => 'required|string',
+        //     'score' => 'required|numeric',
+        //     'assignment_type' => 'required|in:written,observation,homework',
+        //     'semester' => 'required|in:odd,even',
+        // ]);
 
-        // Menggunakan transaksi database untuk memastikan konsistensi data
-        DB::beginTransaction();
-        try {
-            // Buat atau ambil data grade terlebih dahulu
-            $grade = Grade::updateOrCreate(
-                [
-                    'student_id' => $validated['student_id'],
-                    'subject_id' => $validated['subject_id'],
-                    'semester' => $validated['semester']
-                ],
-                ['score' => $validated['score']] // Nilai awal, akan diupdate nanti
-            );
+        // // Menggunakan transaksi database untuk memastikan konsistensi data
+        // DB::beginTransaction();
+        // try {
+        //     // Buat atau ambil data grade terlebih dahulu
+        //     $grade = Grade::updateOrCreate(
+        //         [
+        //             'student_id' => $validated['student_id'],
+        //             'subject_id' => $validated['subject_id'],
+        //             'semester' => $validated['semester']
+        //         ],
+        //         ['score' => $validated['score']] // Nilai awal, akan diupdate nanti
+        //     );
 
-            // Membuat GradeTask baru
-            GradeTask::create([
-                'student_id' => $validated['student_id'],
-                'subject_id' => $validated['subject_id'],
-                'task_name' => $validated['task_name'],
-                'score' => $validated['score'],
-                'type' => $validated['assignment_type'],
-                'grades_id' => $grade->id,
-            ]);
+        //     // Membuat GradeTask baru
+        //     GradeTask::create([
+        //         'student_id' => $validated['student_id'],
+        //         'subject_id' => $validated['subject_id'],
+        //         'task_name' => $validated['task_name'],
+        //         'score' => $validated['score'],
+        //         'type' => $validated['assignment_type'],
+        //         'grades_id' => $grade->id,
+        //     ]);
             
-            DB::commit();
-            return redirect()->route('grades.create')->with('success', 'Nilai tugas berhasil disimpan');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->route('grades.create')->with('error', 'Gagal menyimpan nilai: ' . $e->getMessage());
-        }
+        //     DB::commit();
+        //     return redirect()->route('grades.create')->with('success', 'Nilai tugas berhasil disimpan');
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return redirect()->route('grades.create')->with('error', 'Gagal menyimpan nilai: ' . $e->getMessage());
+        // }
     }
 
     public function store_batch(Request $request)

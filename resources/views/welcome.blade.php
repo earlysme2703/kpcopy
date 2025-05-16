@@ -4,7 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <link rel="icon" type="image/png" href="https://ucarecdn.com/140db37d-4117-4b98-bc0
+    System: 0-20e8d0147903/WhatsApp_Image_20250430_at_105328_AM__1_removebgpreview.png">
     <title>Website Pengelolaan Nilai Siswa</title>
 
     <!-- Fonts -->
