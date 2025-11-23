@@ -36,7 +36,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <!-- Subject Selection -->
                         <div>
-                            <label for="subject_id" class="block text-sm font-medium text-gray-700">Mata Pelajaran *</label>
+                            <label for="subject_id" class="block text-sm font-medium text-gray-700">Mata Pelajaran </label>
                             <select id="subject_id" 
                                 class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                                 required>
@@ -49,7 +49,7 @@
 
                         <!-- Semester Selection -->
                         <div>
-                            <label for="semester" class="block text-sm font-medium text-gray-700">Semester *</label>
+                            <label for="semester" class="block text-sm font-medium text-gray-700">Semester </label>
                             <select id="semester" 
                                 class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                                 required>
@@ -60,11 +60,11 @@
                         
                         <!-- Task Type Selection -->
                         <div>
-                            <label for="task_type" class="block text-sm font-medium text-gray-700">Jenis Tugas *</label>
+                            <label for="task_type" class="block text-sm font-medium text-gray-700">Tipe Tugas </label>
                             <select id="task_type" 
                                 class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                                 onchange="updateTaskName()">
-                                <option value="">Pilih Jenis Tugas</option>
+                                <option value="">Jenis Tugas</option>
                                 <option value="nilai_harian_1">Nilai Harian 1</option>
                                 <option value="nilai_harian_2">Nilai Harian 2</option>
                                 <option value="nilai_harian_3">Nilai Harian 3</option>
@@ -78,7 +78,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <!-- Task Name -->
                         <div>
-                            <label for="task_name" class="block text-sm font-medium text-gray-700">Nama Tugas *</label>
+                            <label for="task_name" class="block text-sm font-medium text-gray-700">Nama Tugas </label>
                             <input type="text" id="task_name" 
                                 class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                                 required>
@@ -86,7 +86,7 @@
                         
                         <!-- Assignment Type -->
                         <div>
-                            <label for="assignment_type" class="block text-sm font-medium text-gray-700">Tipe Tugas *</label>
+                            <label for="assignment_type" class="block text-sm font-medium text-gray-700">Tipe Tugas </label>
                             <select id="assignment_type" 
                                 class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                                 required>
@@ -141,21 +141,20 @@
                             </table>
                         </div>
 
-                <!-- Buttons Inside Container, Below Table, Right-Aligned -->
             <div class="mt-6 flex justify-end gap-2">
+
+                 <button type="button" id="resetBtn"
+                    class="inline-flex items-center px-4 py-2 border border-red-700 text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
+                    <span class="iconify mr-2 text-lg" data-icon="mdi:refresh"></span>
+                    Reset
+                </button>
                 <!-- Save Button -->
                 <button type="button" id="submitBtn"
                     class="inline-flex items-center px-4 py-2 border border-indigo-700 text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
                     <span class="iconify mr-2 text-lg" data-icon="mdi:content-save"></span>
                     Simpan
                 </button>
-
-                <!-- Reset Button -->
-                <button type="button" id="resetBtn"
-                    class="inline-flex items-center px-4 py-2 border border-red-700 text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
-                    <span class="iconify mr-2 text-lg" data-icon="mdi:refresh"></span>
-                    Reset
-                </button>
+               
             </div>
                     </form>
                 @else
@@ -175,6 +174,18 @@
     </div>
 
     <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    @if(session('show_notification_prompt'))
+        if (confirm("{{ session('success') }}\n\nApakah Anda ingin mengirim notifikasi WhatsApp ke orang tua sekarang?")) {
+            const subjectId = "{{ session('notification_subject_id') }}";
+            const taskName  = "{{ session('notification_task_name') }}";
+            window.location.href = `{{ route('notifications.index') }}?subject_id=${subjectId}&task_name=${encodeURIComponent(taskName)}`;
+        } else {
+            window.location.href = `{{ route('grades.list') }}`;
+        }
+    @endif
+    });
+
     document.addEventListener('DOMContentLoaded', function() {
         // Throttle configuration
         const throttleDelay = 300;

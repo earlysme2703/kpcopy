@@ -73,21 +73,15 @@
                                                         <th rowspan="3" class="p-2 border border-gray-300 text-xs font-medium tracking-wider text-left text-gray-500 uppercase align-middle">No</th>
                                                         <th rowspan="3" class="p-2 border border-gray-300 text-xs font-medium tracking-wider text-left text-gray-500 uppercase align-middle">NIS</th>
                                                         <th rowspan="3" class="p-2 border border-gray-300 text-xs font-medium tracking-wider text-left text-gray-500 uppercase align-middle">Nama Siswa</th>
-                                                        <th colspan="18" class="p-2 border border-gray-300 text-xs font-medium tracking-wider text-center text-gray-500 uppercase">FORMATIF</th>
+                                                        <th colspan="12" class="p-2 border border-gray-300 text-xs font-medium tracking-wider text-center text-gray-500 uppercase">FORMATIF</th>
                                                         <th colspan="2" rowspan="2" class="p-2 border border-gray-300 text-xs font-medium tracking-wider text-center text-gray-500 uppercase">SUMATIF</th>
                                                         <th rowspan="3" class="p-2 border border-gray-300 text-xs font-medium tracking-wider text-center text-gray-500 uppercase align-middle">Nilai Akhir</th>
-                                                        <th rowspan="3" class="p-2 border border-gray-300 text-xs font-medium tracking-wider text-center text-gray-500 uppercase align-middle">Predikat</th>
                                                     </tr>
                                                     <tr>
                                                         <th colspan="6" class="p-2 border border-gray-300 text-xs font-medium tracking-wider text-center text-gray-500 uppercase">TERTULIS (A)</th>
                                                         <th colspan="6" class="p-2 border border-gray-300 text-xs font-medium tracking-wider text-center text-gray-500 uppercase">PENGAMATAN (B)</th>
-                                                        <th colspan="6" class="p-2 border border-gray-300 text-xs font-medium tracking-wider text-center text-gray-500 uppercase">TUGAS (P)</th>
                                                     </tr>
                                                     <tr>
-                                                        @for ($i = 1; $i <= 5; $i++)
-                                                            <th class="p-2 border border-gray-300 text-xs font-medium tracking-wider text-center text-gray-500 uppercase">{{ $i }}</th>
-                                                        @endfor
-                                                        <th class="p-2 border border-gray-300 text-xs font-medium tracking-wider text-center text-gray-500 uppercase">RT2</th>
                                                         @for ($i = 1; $i <= 5; $i++)
                                                             <th class="p-2 border border-gray-300 text-xs font-medium tracking-wider text-center text-gray-500 uppercase">{{ $i }}</th>
                                                         @endfor
@@ -130,15 +124,6 @@
                                                             <td class="p-2 border border-gray-300 text-sm text-center text-gray-900 whitespace-nowrap">
                                                                 {{ $student['average_observation'] ?? '-' }}
                                                             </td>
-                                                            <!-- sumatif scores (Tugas) -->
-                                                            @for ($i = 0; $i < 5; $i++)
-                                                                <td class="p-2 border border-gray-300 text-sm text-center text-gray-900 whitespace-nowrap">
-                                                                    {{ $student['sumatif'][$i] }}
-                                                                </td>
-                                                            @endfor
-                                                            <td class="p-2 border border-gray-300 text-sm text-center text-gray-900 whitespace-nowrap">
-                                                                {{ $student['average_sumatif'] ?? '-' }}
-                                                            </td>
                                                             <!-- Sumatif scores -->
                                                             <td class="p-2 border border-gray-300 text-sm text-center text-gray-900 whitespace-nowrap">
                                                                 {{ $student['midterm_score'] ?? '-' }}
@@ -150,13 +135,10 @@
                                                             <td class="p-2 border border-gray-300 text-sm text-center text-gray-900 whitespace-nowrap">
                                                                 {{ $student['final_score'] ?? '-' }}
                                                             </td>
-                                                            <td class="p-2 border border-gray-300 text-sm font-semibold text-center text-gray-900 whitespace-nowrap">
-                                                                {{ $student['grade_letter'] ?? '-' }}
-                                                            </td>
                                                         </tr>
                                                     @empty
                                                         <tr>
-                                                            <td colspan="24" class="p-4 text-sm text-center text-gray-500 border border-gray-300">
+                                                            <td colspan="18" class="p-4 text-sm text-center text-gray-500 border border-gray-300">
                                                                 Tidak ada data nilai untuk filter yang dipilih
                                                             </td>
                                                         </tr>
@@ -167,24 +149,23 @@
                                     </div>
 
                                     <!-- Export form -->
-                                   <!-- Export form -->
-<form method="POST" action="{{ route('grades.generate-export') }}">
-    @csrf
-    <input type="hidden" name="class_id" value="{{ $class->id }}">
-    <input type="hidden" name="subject_id" value="{{ $selectedSubject->id }}">
-    <input type="hidden" name="semester" value="{{ $selectedSemester }}">
+                                    <form method="POST" action="{{ route('grades.generate-export') }}">
+                                        @csrf
+                                        <input type="hidden" name="class_id" value="{{ $class->id }}">
+                                        <input type="hidden" name="subject_id" value="{{ $selectedSubject->id }}">
+                                        <input type="hidden" name="semester" value="{{ $selectedSemester }}">
 
-    <div class="flex gap-2 justify-end">
-        <button type="submit" name="export_type" value="pdf"
-            class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-            <i class="mr-1 fas fa-file-pdf"></i> Ekspor PDF
-        </button>
-        <button type="submit" name="export_type" value="excel"
-            class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-            <i class="mr-1 fas fa-file-excel"></i> Ekspor Excel
-        </button>
-    </div>
-</form>
+                                        <div class="flex gap-2 justify-end">
+                                            <button type="submit" name="export_type" value="pdf"
+                                                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                                <i class="mr-1 fas fa-file-pdf"></i> Ekspor PDF
+                                            </button>
+                                            <button type="submit" name="export_type" value="excel"
+                                                class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                                <i class="mr-1 fas fa-file-excel"></i> Ekspor Excel
+                                            </button>
+                                        </div>
+                                    </form>
                                 @else
                                     <div class="px-4 py-3 text-sm text-blue-700 bg-blue-100 rounded-md">
                                         Silakan pilih mata pelajaran dan semester untuk melihat data nilai.

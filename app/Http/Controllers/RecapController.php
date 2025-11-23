@@ -104,12 +104,6 @@ class RecapController extends Controller
                    $grades = Grade::whereIn('student_id', $studentIds)
                                   ->where('subject_id', $subject_id)
                                   ->where('semester', $semester)
-                                  ->select('id', 'student_id', 'subject_id', 'semester', 'midterm_score', 'final_exam_score', 'final_score', 'grade_letter')
-                                  ->with(['gradeTasks' => function ($query) {
-                                      $query->select('id', 'grades_id', 'type', 'score', 'created_at')
-                                            ->orderBy('created_at')
-                                            ->take(15);
-                                  }])
                                   ->get()
                                   ->keyBy('student_id');
     
@@ -120,14 +114,11 @@ class RecapController extends Controller
                            'name' => $student->name,
                            'written' => array_fill(0, 5, '-'),
                            'observation' => array_fill(0, 5, '-'),
-                           'sumatif' => array_fill(0, 5, '-'),
                            'average_written' => null,
                            'average_observation' => null,
-                           'average_sumatif' => null,
                            'midterm_score' => null,
                            'final_exam_score' => null,
-                           'final_score' => null,
-                           'grade_letter' => '-' // Pastikan grade_letter selalu ada
+                           'final_score' => null
                        ];
                        
                        $grade = $grades->get($student->id);
@@ -141,7 +132,7 @@ class RecapController extends Controller
                            
                            $writtenScores = [];
                            $observationScores = [];
-                           $sumatifScores = [];
+                           $sumatifScores = []; // Untuk UTS dan UAS
                            
                            foreach ($tasks as $task) {
                                if ($task->type === 'written' && $writtenCounter < 5) {
@@ -152,8 +143,8 @@ class RecapController extends Controller
                                    $studentData['observation'][$observationCounter] = $task->score;
                                    $observationScores[] = $task->score;
                                    $observationCounter++;
-                               } elseif ($task->type === 'sumatif' && $sumatifCounter < 5) {
-                                   $studentData['sumatif'][$sumatifCounter] = $task->score;
+                               } elseif ($task->type === 'sumatif' && $sumatifCounter < 2) {
+                                   // Sumatif pertama = UTS, Sumatif kedua = UAS
                                    $sumatifScores[] = $task->score;
                                    $sumatifCounter++;
                                }
@@ -161,14 +152,16 @@ class RecapController extends Controller
                            
                            $averageWritten = !empty($writtenScores) ? array_sum($writtenScores) / count($writtenScores) : null;
                            $averageObservation = !empty($observationScores) ? array_sum($observationScores) / count($observationScores) : null;
-                           $averagesumatif = !empty($sumatifScores) ? array_sum($sumatifScores) / count($sumatifScores) : null;
+                           
+                           // Ambil UTS dan UAS dari sumatif tasks
+                           $midtermScore = isset($sumatifScores[0]) ? $sumatifScores[0] : null;
+                           $finalExamScore = isset($sumatifScores[1]) ? $sumatifScores[1] : null;
                            
                            $components = array_filter([
                                $averageWritten,
                                $averageObservation,
-                               $averagesumatif,
-                               $grade->midterm_score,
-                               $grade->final_exam_score
+                               $midtermScore,
+                               $finalExamScore
                            ], fn($value) => !is_null($value));
                            
                            $finalScore = !empty($components) ? array_sum($components) / count($components) : 0;
@@ -177,17 +170,16 @@ class RecapController extends Controller
                                'id' => $grade->id,
                                'average_written' => $averageWritten,
                                'average_observation' => $averageObservation,
-                               'average_sumatif' => $averagesumatif,
+                               'midterm_score' => $midtermScore,
+                               'final_exam_score' => $finalExamScore,
                                'final_score' => $finalScore,
                            ];
                            
                            $studentData['average_written'] = $averageWritten;
                            $studentData['average_observation'] = $averageObservation;
-                           $studentData['average_sumatif'] = $averagesumatif;
-                           $studentData['midterm_score'] = $grade->midterm_score;
-                           $studentData['final_exam_score'] = $grade->final_exam_score;
+                           $studentData['midterm_score'] = $midtermScore;
+                           $studentData['final_exam_score'] = $finalExamScore;
                            $studentData['final_score'] = $finalScore;
-                           $studentData['grade_letter'] = $grade->grade_letter ?? '-';
                        }
                        
                        $result[] = $studentData;
@@ -198,27 +190,12 @@ class RecapController extends Controller
             Grade::where('id', $update['id'])->update([
                 'average_written' => $update['average_written'],
                 'average_observation' => $update['average_observation'],
-                'average_sumatif' => $update['average_sumatif'],
+                'midterm_score' => $update['midterm_score'],
+                'final_exam_score' => $update['final_exam_score'],
                 'final_score' => $update['final_score'],
             ]);
         }
     
         return $result;
-    }
-    
-    private function getDescription($grade)
-    {
-        switch ($grade) {
-            case 'A':
-                return 'Sangat Baik';
-            case 'B':
-                return 'Baik';
-            case 'C':
-                return 'Cukup';
-            case 'D':
-                return 'Perlu Bimbingan';
-            default:
-                return '';
-        }
     }
 }

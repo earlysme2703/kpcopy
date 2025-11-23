@@ -256,7 +256,13 @@ class GradeController extends Controller
             
             DB::commit();
             $updatedCount = count($studentIds);
-            return redirect()->back()->with('success', "Berhasil menyimpan nilai untuk {$updatedCount} siswa.");
+            return redirect()->back()->with([
+            'success'               => "Berhasil menyimpan nilai untuk {$updatedCount} siswa.",
+            'show_notification_prompt' => true,                 // flag untuk JS
+            'notification_subject_id'  => $subjectId,           // mata pelajaran yang dipilih
+            'notification_task_name'   => $taskName,            // nama tugas yang dipilih
+        ]);
+          
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Gagal menyimpan nilai: ' . $e->getMessage());
