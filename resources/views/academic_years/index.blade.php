@@ -101,6 +101,13 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                         @if (!$year->is_active)
                                             <div class="flex items-center justify-center gap-3">
+                                                <button
+                                                    @click="openEditModal({ id: {{ $year->id }}, name: '{{ $year->name }}' })"
+                                                    class="text-blue-600 hover:text-blue-900 transition-colors"
+                                                    title="Edit">
+                                                    <span class="iconify text-xl" data-icon="mdi:pencil"></span>
+                                                </button>
+
                                                 <form action="{{ route('admin.academic-years.setActive', $year->id) }}"
                                                     method="POST">
                                                     @csrf
@@ -151,25 +158,27 @@
 
         </div>
 
-        <!-- Modal Tambah -->
+        <!-- Modal Tambah/Edit -->
         <div x-show="openModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
             x-cloak>
             <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4" @click.away="openModal = false">
                 <div class="p-6">
-                    <h3 class="text-xl font-bold mb-4 flex items-center">
-                        <span class="iconify text-indigo-600 text-2xl mr-2" data-icon="mdi:plus"></span>
-                        Tambah Tahun Ajaran
+                    <h3 class="text-xl font-bold mb-4 flex items-center"
+                        x-text="isEdit ? 'Edit Tahun Ajaran' : 'Tambah Tahun Ajaran'">
+                        <span class="iconify text-indigo-600 text-2xl mr-2"
+                            :data-icon="isEdit ? 'mdi:pencil' : 'mdi:plus'"></span>
                     </h3>
 
-                    <form action="{{ route('admin.academic-years.store') }}" method="POST">
+                    <form :action="formAction" method="POST">
                         @csrf
+                        <input type="hidden" name="_method" x-bind:value="isEdit ? 'PUT' : 'POST'">
 
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Tahun Ajaran <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" name="name" placeholder="2024/2025" pattern="\d{4}/\d{4}"
-                                title="Format harus YYYY/YYYY (contoh: 2024/2025)"
+                            <input type="text" name="name" x-model="form.name" placeholder="2024/2025"
+                                pattern="\d{4}/\d{4}" title="Format harus YYYY/YYYY (contoh: 2024/2025)"
                                 class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                 required>
                             <p class="text-xs text-gray-500 mt-1">Format: YYYY/YYYY (contoh: 2024/2025)</p>
@@ -195,7 +204,25 @@
     <script>
         function academicYearManager() {
             return {
-                openModal: false
+                openModal: false,
+                isEdit: false,
+                form: {
+                    name: ''
+                },
+                formAction: '{{ route('admin.academic-years.store') }}',
+
+                openEditModal(year) {
+                    this.isEdit = true;
+                    this.form.name = year.name;
+                    this.formAction = '/admin/academic-years/' + year.id;
+                    this.openModal = true;
+                },
+
+                resetForm() {
+                    this.isEdit = false;
+                    this.form.name = '';
+                    this.formAction = '{{ route('admin.academic-years.store') }}';
+                }
             }
         }
     </script>

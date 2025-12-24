@@ -51,6 +51,39 @@ class AcademicYearController extends Controller
     }
 
     /**
+     * Update tahun ajaran
+     */
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:20|unique:academic_years,name,' . $id . '|regex:/^\d{4}\/\d{4}$/',
+        ], [
+            'name.required' => 'Nama tahun ajaran harus diisi.',
+            'name.unique' => 'Tahun ajaran sudah ada.',
+            'name.regex' => 'Format tahun ajaran harus YYYY/YYYY (contoh: 2024/2025).'
+        ]);
+
+        // Validasi tahun ajaran: tahun kedua harus lebih besar 1 dari tahun pertama
+        $years = explode('/', $request->name);
+        if (count($years) == 2) {
+            $year1 = (int) $years[0];
+            $year2 = (int) $years[1];
+            
+            if ($year2 != $year1 + 1) {
+                return back()->with('error', 'Tahun kedua harus lebih besar 1 dari tahun pertama (contoh: 2024/2025).');
+            }
+        }
+
+        $academicYear = AcademicYear::findOrFail($id);
+        $academicYear->update([
+            'name' => $request->name,
+        ]);
+
+        return redirect()->route('admin.academic-years.index')
+            ->with('success', 'Tahun ajaran berhasil diperbarui.');
+    }
+
+    /**
      * Set tahun ajaran sebagai aktif
      */
     public function setActive($id)

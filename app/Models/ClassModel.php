@@ -31,6 +31,17 @@ class ClassModel extends Model
     }
 
     /**
+     * Relasi many-to-many ke academic_years melalui pivot table
+     */
+    public function academicYears()
+    {
+        return $this->belongsToMany(AcademicYear::class, 'class_academic_year')
+                    ->withPivot('is_active')
+                    ->withTimestamps();
+    }
+
+
+    /**
      * Helper: Ambil jumlah siswa pada tahun ajaran tertentu
      */
     public function getStudentCount($academicYearId)

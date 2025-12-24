@@ -78,6 +78,9 @@ Route::middleware(['auth', 'role:Admin'])
             Route::post('/store', [AcademicYearController::class, 'store'])
                 ->name('store');
 
+            Route::put('/{id}', [AcademicYearController::class, 'update'])
+                ->name('update');
+
             Route::post('/{id}/set-active', [AcademicYearController::class, 'setActive'])
                 ->name('setActive');
 

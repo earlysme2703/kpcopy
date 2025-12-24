@@ -33,12 +33,12 @@ class ClassController extends Controller
         }
 
         // =============================
-        // 3️⃣ Ambil data kelas & wali kelas
+        // 3️⃣ Ambil data kelas & wali kelas (filter by academic year)
         // =============================
-        // =============================
-        // 3️⃣ Ambil data kelas & wali kelas
-        // =============================
-        $classes = ClassModel::with(['waliKelas' => function ($query) {
+        $classes = ClassModel::whereHas('academicYears', function ($query) use ($selectedYear) {
+            $query->where('academic_year_id', $selectedYear->id);
+        })
+        ->with(['waliKelas' => function ($query) {
             $query->where('role_id', 2);
         }])
         ->withCount(['studentClasses' => function ($query) use ($selectedYear) {
@@ -63,9 +63,19 @@ class ClassController extends Controller
             'name' => 'required|string|max:100|unique:classes,name',
         ]);
 
-        ClassModel::create([
+        $class = ClassModel::create([
             'name' => $request->name,
         ]);
+
+        // Attach class to active academic year
+        $activeYear = AcademicYear::where('is_active', 1)->first();
+        if ($activeYear) {
+            $class->academicYears()->attach($activeYear->id, [
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
         return redirect()->route('admin.kelas.index')
             ->with('success', 'Kelas berhasil ditambahkan.');

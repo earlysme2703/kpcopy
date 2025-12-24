@@ -5,6 +5,7 @@
 /storage/*.key
 /storage/pail
 /vendor
+plantuml
 .env
 .env.backup
 .env.production
