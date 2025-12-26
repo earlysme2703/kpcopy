@@ -2,72 +2,52 @@
 
 namespace Database\Seeders;
 
-use App\Models\Student;
-use App\Models\ClassModel;
-use App\Models\AcademicYear;
-use App\Models\StudentClass;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Student;
+use App\Models\StudentClass;
 
 class StudentSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        Student::truncate();
-        StudentClass::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        $student1 = Student::create([
+            'name' => 'Siswa Titipan Dara',
+            'nis' => 20240670,
+            'gender' => 'L',
+            'parent_phone' => 6283113355381,
+            'parent_name' => 'Rahayu Rina Wahyuni',
+            'birth_place' => 'Padang',
+            'birth_date' => '2004-12-02',
+        ]);
 
-        $faker = \Faker\Factory::create('id_ID');
+        $student2 = Student::create([
+            'name' => 'Siswa Titipan Early',
+            'nis' => 20240671,
+            'gender' => 'P',
+            'parent_phone' => 6283113355381,
+            'parent_name' => 'Rahayu Rina Wahyuni',
+            'birth_place' => 'Padang',
+            'birth_date' => '2004-12-02',
+        ]);
 
-        // Get Active Academic Year
-        $year = AcademicYear::where('is_active', 1)->first();
+        // Student-Class relationships
+        StudentClass::create([
+            'student_id' => 1,
+            'class_id' => 1,
+            'academic_year_id' => 2,
+        ]);
 
-        if (!$year) {
-            $this->command->error("No active academic year found! Run AcademicYearSeeder first.");
-            return;
-        }
+        StudentClass::create([
+            'student_id' => 2,
+            'class_id' => 3,
+            'academic_year_id' => 2,
+        ]);
 
-        // Ensure we have classes
-        $classes = ClassModel::all();
-        if ($classes->isEmpty()) {
-            $this->command->warn('No classes found. Please run ClassSeeder first.');
-            return;
-        }
+        StudentClass::create([
+            'student_id' => 1,
+            'class_id' => 2,
+            'academic_year_id' => 1,
+        ]);
 
-        $this->command->info("Seeding for Academic Year: {$year->name}");
-        
-        foreach ($classes as $class) {
-            for ($i = 0; $i < 10; $i++) {
-                $gender = $faker->randomElement(['L', 'P']);
-                $phone = '628' . $faker->unique()->numberBetween(100000000, 999999999);
-
-                // Create Student
-                $student = Student::create([
-                    'name'         => $gender === 'L'
-                        ? $faker->firstNameMale . ' ' . $faker->lastName
-                        : $faker->firstNameFemale . ' ' . $faker->lastName,
-                    'nis'          => $faker->unique()->numerify('2024####'), // Changed to 2024 pref
-                    'gender'       => $gender,
-                    'parent_phone' => $phone,
-                    'parent_name'  => $faker->name,
-                    'birth_place'  => $faker->city,
-                    'birth_date'   => $faker->dateTimeBetween('-12 years', '-7 years')->format('Y-m-d'),
-                    'created_at'   => now(),
-                    'updated_at'   => now(),
-                ]);
-
-                // Link to Class and Year
-                StudentClass::create([
-                    'student_id' => $student->id,
-                    'class_id' => $class->id,
-                    'academic_year_id' => $year->id
-                ]);
-            }
-            $this->command->info("  - Class {$class->name}: 10 students seeded.");
-        }
-
-        $totalStudents = Student::count();
-        $this->command->info("SELESAI! Total {$totalStudents} data siswa dummy berhasil dibuat untuk tahun {$year->name}.");
     }
 }

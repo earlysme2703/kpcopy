@@ -8,51 +8,32 @@ use Spatie\Permission\Models\Permission;
 
 class RolePermissionSeeder extends Seeder
 {
-        public function run()
+    public function run(): void
     {
-        // Buat Role
-        Role::firstOrCreate(['id' => 1, 'name' => 'Admin', 'guard_name' => 'web']);
-        Role::firstOrCreate(['id' => 2, 'name' => 'Wali Kelas', 'guard_name' => 'web']);
-        Role::firstOrCreate(['id' => 3, 'name' => 'Guru Mata Pelajaran', 'guard_name' => 'web']);
+        // Create Permissions
+        Permission::create(['name' => 'kelola siswa', 'guard_name' => 'web']);
+        Permission::create(['name' => 'kelola mapel', 'guard_name' => 'web']);
+        Permission::create(['name' => 'kelola kelas', 'guard_name' => 'web']);
+        Permission::create(['name' => 'kelola pengguna', 'guard_name' => 'web']);
+        Permission::create(['name' => 'kelola guru', 'guard_name' => 'web']);
+        Permission::create(['name' => 'kelola nilai', 'guard_name' => 'web']);
+        Permission::create(['name' => 'kirim notifikasi orang tua', 'guard_name' => 'web']);
+        Permission::create(['name' => 'kelola rapot', 'guard_name' => 'web']);
 
-        // Buat Permission (meskipun belum digunakan)
-        $permissions = [
-            'kelola siswa',
-            'kelola mapel',
-            'kelola kelas',
-            'kelola pengguna',
-            'kelola guru',
-            'kelola nilai',
-            'kirim notifikasi orang tua',
-            'kelola rapot',
-        ];
+        // Create Roles
+        $role1 = Role::create(['name' => 'Admin', 'guard_name' => 'web']);
+        $role2 = Role::create(['name' => 'Wali Kelas', 'guard_name' => 'web']);
+        $role3 = Role::create(['name' => 'Guru Mata Pelajaran', 'guard_name' => 'web']);
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
-        }
-
-        // Assign permission ke role
-        $adminRole = Role::find(1);
-        $adminRole->syncPermissions(
-            [
-                'kelola siswa',
-                'kelola mapel',
-                'kelola kelas',
-                'kelola pengguna',
-                'kelola guru',
-            ]
-        );
-
-        $waliKelasRole = Role::find(2);
-        $waliKelasRole->syncPermissions([
-            'kelola nilai',
-            'kirim notifikasi orang tua',
-            'kelola rapot',
-        ]);
-
-        $guruMapelRole = Role::find(3);
-        $guruMapelRole->syncPermissions([
-            'kelola nilai',
-        ]);
+        // Assign Permissions to Roles
+        $role1->givePermissionTo('kelola siswa');
+        $role1->givePermissionTo('kelola mapel');
+        $role1->givePermissionTo('kelola kelas');
+        $role1->givePermissionTo('kelola pengguna');
+        $role1->givePermissionTo('kelola guru');
+        $role2->givePermissionTo('kelola nilai');
+        $role3->givePermissionTo('kelola nilai');
+        $role2->givePermissionTo('kirim notifikasi orang tua');
+        $role2->givePermissionTo('kelola rapot');
     }
 }

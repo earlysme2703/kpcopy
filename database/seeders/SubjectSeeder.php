@@ -3,30 +3,20 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Subject;
 
 class SubjectSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        $subjects = [
-            'Matematika',
-            'Bahasa Indonesia',
-            'IPA',
-            'IPS',
-            'Bahasa Daerah',
-            'Pendidikan Pancasila',
-            'Bahasa Inggris',
-            'Keterampilan',
-            'PJOK',
-            'Agama'
-        ];
-
-        foreach ($subjects as $subject) {
-            DB::table('subjects')->updateOrInsert(
-                ['name' => $subject],
-                ['name' => $subject]
-            );
-        }
+        Subject::create(['name' => 'Matematika']);
+        Subject::create(['name' => 'Bahasa Indonesia']);
+        Subject::create(['name' => 'Bahasa Daerah']);
+        Subject::create(['name' => 'Pendidikan Pancasila']);
+        Subject::create(['name' => 'Bahasa Inggris']);
+        Subject::create(['name' => 'Seni Budaya dan Prakarya']);
+        Subject::create(['name' => 'Pendidikan Agama Islam dan Budi Pekerti']);
+        Subject::create(['name' => 'Ilmu Pengetahuan Alam dan Sosial']);
+        Subject::create(['name' => 'PJOK']);
     }
 }

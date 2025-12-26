@@ -7,12 +7,14 @@ use App\Models\ClassModel;
 
 class ClassSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        $classes = ['Kelas 1', 'Kelas 2', 'Kelas 3', 'Kelas 4', 'Kelas 5', 'Kelas 6'];
-
-        foreach ($classes as $class) {
-            ClassModel::create(['name' => $class]);
-        }
+        ClassModel::create(['name' => 'Kelas 1']);
+        ClassModel::create(['name' => 'Kelas 2']);
+        ClassModel::create(['name' => 'Kelas 3']);
+        ClassModel::create(['name' => 'Kelas 4']);
+        ClassModel::create(['name' => 'Kelas 5']);
+        ClassModel::create(['name' => 'Kelas 6']);
+        ClassModel::create(['name' => 'Kelas 1B']);
     }
 }

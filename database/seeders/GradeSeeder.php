@@ -2,87 +2,96 @@
 
 namespace Database\Seeders;
 
-use App\Models\Grade;
-use App\Models\GradeTask;
-use App\Models\StudentClass;
-use App\Models\Subject;
-use App\Models\AcademicYear;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Grade;
 
 class GradeSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        $activeYear = AcademicYear::where('is_active', 1)->first();
-        if (!$activeYear) {
-            echo "No active academic year found.\n";
-            return;
-        }
+        Grade::create([
+            'student_id' => 2,
+            'subject_id' => 5,
+            'semester' => 'Odd',
+            'average_written' => 71.75,
+            'average_observation' => 76.50,
+            'average_homework' => null,
+            'midterm_score' => 56.00,
+            'final_exam_score' => 77.00,
+            'final_score' => 70.31,
+            'grade_letter' => null,
+            'academic_year_id' => 2,
+        ]);
 
-        // Ambil siswa dari kelas 3
-        $studentIds = StudentClass::where('class_id', 3)
-            ->where('academic_year_id', $activeYear->id)
-            ->limit(5)
-            ->pluck('student_id');
+        Grade::create([
+            'student_id' => 2,
+            'subject_id' => 1,
+            'semester' => 'Odd',
+            'average_written' => 77.00,
+            'average_observation' => null,
+            'average_homework' => null,
+            'midterm_score' => null,
+            'final_exam_score' => null,
+            'final_score' => 77.00,
+            'grade_letter' => null,
+            'academic_year_id' => 2,
+        ]);
 
-        if ($studentIds->isEmpty()) {
-            echo "Tidak ada siswa di kelas 3 untuk tahun ajaran ini.\n";
-            return;
-        }
+        Grade::create([
+            'student_id' => 1,
+            'subject_id' => 10,
+            'semester' => 'Odd',
+            'average_written' => null,
+            'average_observation' => null,
+            'average_homework' => null,
+            'midterm_score' => null,
+            'final_exam_score' => null,
+            'final_score' => 0.00,
+            'grade_letter' => null,
+            'academic_year_id' => 2,
+        ]);
 
-        // Ambil mata pelajaran
-        $subjects = Subject::all();
+        Grade::create([
+            'student_id' => 2,
+            'subject_id' => 2,
+            'semester' => 'Odd',
+            'average_written' => 77.00,
+            'average_observation' => 88.00,
+            'average_homework' => null,
+            'midterm_score' => null,
+            'final_exam_score' => null,
+            'final_score' => 82.50,
+            'grade_letter' => null,
+            'academic_year_id' => 2,
+        ]);
 
-        foreach ($studentIds as $studentId) {
-            foreach ($subjects as $subject) {
-                // Generate Score
-                $score = rand(70, 95);
+        Grade::create([
+            'student_id' => 2,
+            'subject_id' => 4,
+            'semester' => 'Odd',
+            'average_written' => 55.00,
+            'average_observation' => null,
+            'average_homework' => null,
+            'midterm_score' => null,
+            'final_exam_score' => null,
+            'final_score' => 55.00,
+            'grade_letter' => null,
+            'academic_year_id' => 2,
+        ]);
 
-                // Create Grade (using updateOrCreate to avoid duplicates)
-                $grade = Grade::updateOrCreate(
-                    [
-                        'student_id'       => $studentId,
-                        'subject_id'       => $subject->id,
-                        'semester'         => 'Odd',
-                        'academic_year_id' => $activeYear->id,
-                    ],
-                    [
-                        'average_written'     => $score,
-                        'average_observation' => $score - rand(0, 5),
-                        'midterm_score'       => $score - rand(0, 5),
-                        'final_exam_score'    => $score,
-                        'final_score'         => $score,
-                        'grade_letter'        => $score >= 85 ? 'A' : 'B',
-                        'academic_year_id'    => $activeYear->id, // Redundant but safe
-                    ]
-                );
+        Grade::create([
+            'student_id' => 2,
+            'subject_id' => 10,
+            'semester' => 'Odd',
+            'average_written' => 99.00,
+            'average_observation' => 69.00,
+            'average_homework' => null,
+            'midterm_score' => null,
+            'final_exam_score' => null,
+            'final_score' => 84.00,
+            'grade_letter' => null,
+            'academic_year_id' => 2,
+        ]);
 
-                // Create Tasks for this Grade
-                GradeTask::create([
-                    'student_id'   => $studentId,
-                    'subject_id'   => $subject->id,
-                    'task_name'    => 'Tugas Harian 1',
-                    'type'         => 'written',
-                    'grades_id'    => $grade->id,
-                    'score'        => $score,
-                    'created_at'   => now(),
-                    'updated_at'   => now(),
-                ]);
-
-                GradeTask::create([
-                    'student_id'   => $studentId,
-                    'subject_id'   => $subject->id,
-                    'task_name'    => 'Tugas Harian 2',
-                    'type'         => 'observation',
-                    'grades_id'    => $grade->id,
-                    'score'        => $score - rand(0, 5),
-                    'created_at'   => now(),
-                    'updated_at'   => now(),
-                ]);
-            }
-        }
-        
-        $this->command->info("Seeded grades for " . $studentIds->count() . " students.");
     }
 }
