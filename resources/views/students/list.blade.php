@@ -290,11 +290,17 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Lahir <span
                                                 class="text-red-500">*</span></label>
-                                        <input type="date" name="birth_date"
+                                        <input type="text" name="birth_date_display"
                                             class="w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-150"
-                                            x-model="form.birth_date" required>
+                                            x-model="form.birth_date_display" placeholder="DD/MM/YYYY"
+                                            pattern="\d{2}/\d{2}/\d{4}"
+                                            title="Format: DD/MM/YYYY (contoh: 15/08/2010)"
+                                            @input="formatDateInput('birth_date')" required>
+                                        <input type="hidden" name="birth_date" x-model="form.birth_date">
                                         <div x-show="errors.birth_date" class="text-red-500 text-xs mt-1"
                                             x-text="errors.birth_date"></div>
+                                        <span class="text-xs text-gray-500 mt-1 block">Format: Tanggal/Bulan/Tahun
+                                            (contoh: 15/08/2010)</span>
                                     </div>
                                 </div>
 
@@ -355,6 +361,7 @@
                     parent_name: '',
                     birth_place: '',
                     birth_date: '',
+                    birth_date_display: '',
                     parent_phone: ''
                 },
                 errors: {
@@ -378,6 +385,7 @@
                         parent_name: '',
                         birth_place: '',
                         birth_date: '',
+                        birth_date_display: '',
                         parent_phone: ''
                     };
                     this.errors = {
@@ -399,6 +407,14 @@
                         ...student
                     };
 
+                    // Convert birth_date from YYYY-MM-DD to DD/MM/YYYY for display
+                    if (this.form.birth_date) {
+                        const dateParts = this.form.birth_date.split('-');
+                        if (dateParts.length === 3) {
+                            this.form.birth_date_display = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+                        }
+                    }
+
                     if (this.form.parent_phone && this.form.parent_phone.startsWith('62')) {
                         this.form.parent_phone = '0' + this.form.parent_phone.substring(2);
                     }
@@ -417,6 +433,38 @@
                 },
 
 
+
+                formatDateInput(field) {
+                    let input = this.form[field + '_display'];
+                    // Remove non-numeric characters except /
+                    input = input.replace(/[^\d\/]/g, '');
+
+                    // Auto-add slashes
+                    if (input.length >= 2 && input.indexOf('/') === -1) {
+                        input = input.substring(0, 2) + '/' + input.substring(2);
+                    }
+                    if (input.length >= 5 && input.split('/').length === 2) {
+                        const parts = input.split('/');
+                        input = parts[0] + '/' + parts[1].substring(0, 2) + '/' + parts[1].substring(2);
+                    }
+
+                    this.form[field + '_display'] = input;
+
+                    // Convert DD/MM/YYYY to YYYY-MM-DD for database
+                    if (input.length === 10) {
+                        const parts = input.split('/');
+                        if (parts.length === 3) {
+                            const day = parts[0];
+                            const month = parts[1];
+                            const year = parts[2];
+
+                            // Validate date
+                            if (day >= 1 && day <= 31 && month >= 1 && month <= 12 && year.length === 4) {
+                                this.form[field] = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                            }
+                        }
+                    }
+                },
 
                 formatPhoneNumber() {
                     let phone = this.form.parent_phone.replace(/\D/g, '');

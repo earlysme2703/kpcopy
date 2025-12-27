@@ -362,8 +362,15 @@
 
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Lahir</label>
-                                        <input type="date" name="tanggal_lahir" x-model="form.tanggal_lahir"
-                                            class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                                        <input type="text" name="tanggal_lahir_display"
+                                            x-model="form.tanggal_lahir_display"
+                                            class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                            placeholder="DD/MM/YYYY" pattern="\d{2}/\d{2}/\d{4}"
+                                            title="Format: DD/MM/YYYY (contoh: 15/08/1985)"
+                                            @input="formatDateInput('tanggal_lahir')">
+                                        <input type="hidden" name="tanggal_lahir" x-model="form.tanggal_lahir">
+                                        <span class="text-xs text-gray-500 mt-1 block">Format: Tanggal/Bulan/Tahun (contoh:
+                                            15/08/1985)</span>
                                     </div>
 
                                     {{-- Contact Email dipindah ke sebelah Tanggal Lahir --}}
@@ -535,6 +542,7 @@
                     jenis_kelamin: '',
                     tempat_lahir: '',
                     tanggal_lahir: '',
+                    tanggal_lahir_display: '',
                     contact_email: '',
                     class_id: '',
                     subject_id: '',
@@ -562,6 +570,7 @@
                         jenis_kelamin: '',
                         tempat_lahir: '',
                         tanggal_lahir: '',
+                        tanggal_lahir_display: '',
                         contact_email: '',
                         class_id: '',
                         subject_id: ''
@@ -583,10 +592,20 @@
                         jenis_kelamin: row.jenis_kelamin ?? '',
                         tempat_lahir: row.tempat_lahir ?? '',
                         tanggal_lahir: row.tanggal_lahir ?? '',
+                        tanggal_lahir_display: '',
                         contact_email: row.contact_email ?? '',
                         class_id: row.class_id ?? '',
                         subject_id: row.subject_id ?? '',
                     };
+
+                    // Convert tanggal_lahir from YYYY-MM-DD to DD/MM/YYYY for display
+                    if (this.form.tanggal_lahir) {
+                        const dateParts = this.form.tanggal_lahir.split('-');
+                        if (dateParts.length === 3) {
+                            this.form.tanggal_lahir_display = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+                        }
+                    }
+
                     this.resetErrors();
                     this.openModal = true;
                 },
@@ -621,6 +640,38 @@
                             this.form.nama_lengkap = '';
                             this.form.contact_email = '';
                             this.form.class_id = ''; // ← TAMBAHKAN INI
+                        }
+                    }
+                },
+
+                formatDateInput(field) {
+                    let input = this.form[field + '_display'];
+                    // Remove non-numeric characters except /
+                    input = input.replace(/[^\d\/]/g, '');
+
+                    // Auto-add slashes
+                    if (input.length >= 2 && input.indexOf('/') === -1) {
+                        input = input.substring(0, 2) + '/' + input.substring(2);
+                    }
+                    if (input.length >= 5 && input.split('/').length === 2) {
+                        const parts = input.split('/');
+                        input = parts[0] + '/' + parts[1].substring(0, 2) + '/' + parts[1].substring(2);
+                    }
+
+                    this.form[field + '_display'] = input;
+
+                    // Convert DD/MM/YYYY to YYYY-MM-DD for database
+                    if (input.length === 10) {
+                        const parts = input.split('/');
+                        if (parts.length === 3) {
+                            const day = parts[0];
+                            const month = parts[1];
+                            const year = parts[2];
+
+                            // Validate date
+                            if (day >= 1 && day <= 31 && month >= 1 && month <= 12 && year.length === 4) {
+                                this.form[field] = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                            }
                         }
                     }
                 },
